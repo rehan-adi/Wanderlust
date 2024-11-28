@@ -7,25 +7,20 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const uploadOnCloudinary = async (imageBuffer: Buffer) => {
-  try {
-    if (!imageBuffer) return null;
-
-    const response = await cloudinary.uploader.upload_stream(
+export const uploadOnCloudinary = async (imageBuffer: Buffer): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
       { resource_type: "auto" },
       (error, result) => {
         if (error) {
           console.error("Cloudinary upload error:", error);
-          return null;
+          return reject(error);
         }
-        return result;
+        resolve(result);
       }
     );
 
     const bufferStream = Readable.from(imageBuffer);
-    bufferStream.pipe(response);
-  } catch (error) {
-    console.error("Error uploading to Cloudinary:", error);
-    return null;
-  }
+    bufferStream.pipe(uploadStream); // Pipe the stream to Cloudinary
+  });
 };
