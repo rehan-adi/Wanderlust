@@ -1,4 +1,5 @@
 import axios from "axios";
+import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY as string;
@@ -18,10 +19,19 @@ export const POST = async (req: NextRequest) => {
       responseType: "arraybuffer",
     });
 
-    const buffer = Buffer.from(response.data);
-    const imageUrl = `data:image/png;base64,${buffer.toString("base64")}`;
+    const imageBuffer = Buffer.from(response.data);
 
-    return NextResponse.json({ imageUrl });
+    const cloudinaryResponse = await uploadOnCloudinary(imageBuffer);
+    console.log(cloudinaryResponse);
+
+    if (!cloudinaryResponse) {
+      return NextResponse.json(
+        { success: false, message: "Error uploading image to Cloudinary" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ imageUrl: cloudinaryResponse });
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json(
