@@ -7,9 +7,7 @@ const HUGGINGFACE_API_URL = process.env.HUGGINGFACE_API_URL as string;
 
 export const POST = async (req: NextRequest) => {
   try {
-    const body = await req.json();
-
-    const { prompt } = body;
+    const { prompt } = await req.json();
 
     const response = await axios.post(HUGGINGFACE_API_URL, prompt, {
       headers: {
@@ -31,7 +29,9 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    return NextResponse.json({ imageUrl: cloudinaryResponse });
+    const imageUrl = cloudinaryResponse.secure_url;
+
+    return NextResponse.json({ imageUrl });
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json(
