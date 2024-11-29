@@ -1,5 +1,6 @@
 import z from "zod";
 import axios from "axios";
+import prisma from "@/lib/prisma";
 import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,9 +13,40 @@ const promptValidation = z.object({
 
 export const POST = async (req: NextRequest) => {
   try {
-    const body = await req.json();
+    const userId = req.headers.get("x-user-id");
 
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized: No user ID provided" },
+        { status: 403 }
+      );
+    }
+
+    const body = await req.json();
     const prompt = promptValidation.parse(body);
+
+    const activeSession = await prisma.chatSession.findFirst({
+      where: {
+        userId: userId,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      include: {
+        chatHistory: true,
+      },
+    });
+
+    let sessionId = activeSession ? activeSession.id : null;
+
+    if (!sessionId) {
+      const newSession = await prisma.chatSession.create({
+        data: {
+          userId: userId,
+        },
+      });
+      sessionId = newSession.id;
+    }
 
     const response = await axios.post(HUGGINGFACE_API_URL, prompt, {
       headers: {
@@ -37,11 +69,22 @@ export const POST = async (req: NextRequest) => {
 
     const imageUrl = cloudinaryResponse.secure_url;
 
+    await prisma.chatHistory.create({
+      data: {
+        prompt: prompt.prompt,
+        imageUrl,
+        chatSessionId: sessionId,
+      },
+    });
+
     return NextResponse.json({ imageUrl });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: error.errors[0]?.message || "Invalid input" },
+        {
+          success: false,
+          message: error.errors[0]?.message || "Invalid input",
+        },
         { status: 400 }
       );
     }
