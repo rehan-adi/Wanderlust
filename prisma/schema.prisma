@@ -20,15 +20,24 @@ model User {
   image       String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  chatSession ChatSession[]
+}
+
+model ChatSession {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   chatHistory ChatHistory[]
 }
 
 model ChatHistory {
-  id        String   @id @default(uuid())
-  prompt    String
-  imageUrl  String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String      @id @default(uuid())
+  prompt        String
+  imageUrl      String
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
