@@ -1,6 +1,8 @@
 import z from "zod";
 import axios from "axios";
 import prisma from "@/lib/prisma";
+import { pinecone } from "../../../lib/pinecone";
+import { getImageEmbedding } from "@/utils/embedding";
 import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -68,6 +70,19 @@ export const POST = async (req: NextRequest) => {
     }
 
     const imageUrl = cloudinaryResponse.secure_url;
+
+    const embedding = await getImageEmbedding(imageUrl);
+
+    const index = pinecone.Index("image-embeddings");
+    const vectorId = `image-${Date.now()}`;
+
+    await index.upsert([
+      {
+        id: vectorId,
+        metadata: { prompt: prompt.prompt, imageUrl },
+        values: embedding,
+      },
+    ]);
 
     await prisma.chatHistory.create({
       data: {
