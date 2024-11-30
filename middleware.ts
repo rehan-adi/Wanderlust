@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
+interface DecodedToken {
+  id: string;
+  [key: string]: any;
+}
+
 export const middleware = async (req: NextRequest) => {
   const url = req.nextUrl.pathname;
 
@@ -19,34 +24,35 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.next();
   }
 
-  // Check for Authorization header
-  const authHeader = req.headers.get("Authorization");
+  // Get the token from the cookie
+  const token = req.cookies.get("token")?.value;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return NextResponse.json(
       { message: "Authorization token missing or invalid" },
       { status: 401 }
     );
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    // Verify the token
+    // Verify the token and type the decoded value correctly
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    if (typeof decoded !== "object" || !decoded.id) {
+    // Check if the decoded token is valid and has the 'id' property
+    if (typeof decoded === "object" && decoded !== null && "id" in decoded) {
+      const { id } = decoded as DecodedToken;
+
+      // Attach user ID to the response headers
+      const response = NextResponse.next();
+      response.headers.set("x-user-id", id);
+
+      return response;
+    } else {
       return NextResponse.json(
-        { message: "User ID missing in token" },
+        { message: "Invalid token structure or missing user ID" },
         { status: 401 }
       );
     }
-
-    // Attach user ID to the response headers
-    const response = NextResponse.next();
-    response.headers.set("x-user-id", decoded.id);
-
-    return response;
   } catch (error) {
     console.error("Token verification error:", error);
     return NextResponse.json(

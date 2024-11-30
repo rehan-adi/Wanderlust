@@ -13,6 +13,7 @@
     "@prisma/client": "6.0.0",
     "axios": "^1.7.8",
     "cloudinary": "^2.5.1",
+    "cookie": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
     "next": "15.0.4-canary.32",
     "next-auth": "5.0.0-beta.25",
