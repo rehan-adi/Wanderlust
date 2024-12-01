@@ -19,7 +19,7 @@ export const authOptions = {
           data: {
             email: user.email,
             name: user.name,
-            image: user.image
+            image: user.image,
           },
         });
       }
@@ -42,5 +42,11 @@ export const authOptions = {
       return token;
     },
   },
+  session: {
+    strategy: "jwt",
+  },
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/signin",
+  },
 };
