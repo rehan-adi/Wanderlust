@@ -19,7 +19,7 @@ export const authOptions = {
           data: {
             email: user.email,
             name: user.name,
-            image: user.avatar_url,
+            image: user.image
           },
         });
       }
