@@ -15,8 +15,6 @@ export const metadata: Metadata = {
     "Wanderlust",
     "AI-powered images",
   ],
-  themeColor: "#000000",
-  viewport: "width=device-width, initial-scale=1.0",
 
   // Open Graph metadata (for social media sharing)
   openGraph: {
