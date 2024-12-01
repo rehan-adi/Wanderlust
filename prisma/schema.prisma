@@ -14,8 +14,7 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  email       String        @unique
+  email       String        @id @unique
   name        String?
   image       String?
   createdAt   DateTime      @default(now())
@@ -25,8 +24,8 @@ model User {
 
 model ChatSession {
   id          String        @id @default(uuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
+  userEmail   String
+  user        User          @relation(fields: [userEmail], references: [email])
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   chatHistory ChatHistory[]
