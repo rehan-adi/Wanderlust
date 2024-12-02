@@ -1,10 +1,12 @@
 import z from "zod";
 import axios from "axios";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { pinecone } from "../../../lib/pinecone";
 import { getImageEmbedding } from "@/utils/embedding";
 import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY as string;
 const HUGGINGFACE_API_URL = process.env.HUGGINGFACE_API_URL as string;
@@ -15,14 +17,16 @@ const promptValidation = z.object({
 
 export const POST = async (req: NextRequest) => {
   try {
-    const userId = req.headers.get("x-user-id");
+    const session = await getServerSession(authOptions);
 
-    if (!userId) {
+    if (!session || !session.user || !session.user.id) {
       return NextResponse.json(
         { success: false, message: "Unauthorized: No user ID provided" },
         { status: 403 }
       );
     }
+
+    const userId = session.user.id;
 
     const body = await req.json();
     const prompt = promptValidation.parse(body);
