@@ -15,11 +15,12 @@ model User {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   chatSession ChatSession[]
+  images      Images[]
 }
 
 model ChatSession {
   id          String        @id @default(uuid())
-  userId      String       
+  userId      String
   user        User          @relation(fields: [userId], references: [id])
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -34,4 +35,14 @@ model ChatHistory {
   chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+model Images {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  imageUrl  String
+  prompt    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
