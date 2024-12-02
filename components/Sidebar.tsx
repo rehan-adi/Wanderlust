@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useSidebarState } from "@/hooks/use-sidebar";
 import {
   Compass,
   Edit,
@@ -24,36 +25,32 @@ const SidebarItem: React.FC<{ icon: React.ReactNode; label: string }> = ({
   </a>
 );
 
-// Sidebar component
 const Sidebar: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { isOpen, toggle } = useSidebarState();
 
   return (
-    <div
-    className={`flex flex-col transition-all bg-[#0c0f12] duration-300 ${
-      isSidebarOpen
-        ? "md:w-[13vw] border-r border-white border-opacity-10 w-[47vw]"
-        : "w-0 border-none"
-    }`}
-    >
-      <nav className="flex flex-col space-y-2 mt-24 px-3">
-        <SidebarItem icon={<Compass size={21} />} label="Explore" />
-        <SidebarItem icon={<MessagesSquare size={21} />} label="Chat" />
-        <SidebarItem icon={<Edit size={21} />} label="Edit" />
-      </nav>
-
-      {/* Button to toggle sidebar */}
-      <button
-        onClick={toggleSidebar}
-        className="absolute top-5 left-3 z-50 p-3 text-white rounded-md"
+    <>
+      <div
+        className={`fixed top-0 left-0 h-screen z-30 flex flex-col transition-all bg-[#0c0f12] duration-300 ${
+          isOpen
+            ? "md:w-[13vw] border-r border-white border-opacity-10 w-[55vw]"
+            : "w-0 border-none"
+        } overflow-hidden`}
       >
-        {isSidebarOpen ? <PanelRightOpen /> : <PanelLeftOpen />}
+        <nav className="flex flex-col space-y-2 mt-24 px-3">
+          <SidebarItem icon={<Compass size={21} />} label="Explore" />
+          <SidebarItem icon={<MessagesSquare size={21} />} label="Chat" />
+          <SidebarItem icon={<Edit size={21} />} label="Edit" />
+        </nav>
+      </div>
+
+      <button
+        onClick={toggle}
+        className="fixed top-5 left-2 z-50 p-2 text-white rounded-md bg-[#0c0f12] hover:bg-[#2D2E37] transition-colors duration-200"
+      >
+        {isOpen ? <PanelRightOpen size={24} /> : <PanelLeftOpen size={24} />}
       </button>
-    </div>
+    </>
   );
 };
 
