@@ -1,9 +1,34 @@
 "use client";
 
+import axios from "axios";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      const userId = session.user.id;
+      getSession(userId);
+    } else {
+      console.error("No userId found");
+    }
+  }, [session]);
+
+  const getSession = async (userId: string) => {
+    try {
+      const response = await axios.get("/api/session", {
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId,
+        },
+      });
+      console.log("Session response:", response.data);
+    } catch (error) {
+      console.error("Error fetching session:", error);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -30,6 +55,8 @@ export default function Home() {
           className="rounded-full w-32 h-32 mb-4"
         />
         <h1 className="text-2xl">{session.user?.name || "No Name"}</h1>
+        <h1 className="text-2xl">{session.user?.id || "No ID"}</h1>{" "}
+        {/* Display userId */}
         <p className="text-lg">{session.user?.email || "No Email"}</p>
       </div>
     </div>
