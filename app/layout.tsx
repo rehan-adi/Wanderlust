@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Provider from "@/context/Provider";
 import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Wanderlust - AI Generated Images",
@@ -48,9 +49,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Provider>
-        <body className="w-full h-screen flex">
+        <body className="bg-[#0c0f12]">
           <Sidebar />
-          <main className="w-full flex-1">{children}</main>
+          <Navbar />
+          <main className="min-h-screen transition-all duration-300">
+            {children}
+          </main>
         </body>
       </Provider>
     </html>
