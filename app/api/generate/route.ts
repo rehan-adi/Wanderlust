@@ -96,6 +96,14 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
+    await prisma.images.create({
+      data: {
+        userId: userId,
+        imageUrl,
+        prompt: prompt.prompt
+      },
+    })
+
     return NextResponse.json({ imageUrl });
   } catch (error) {
     if (error instanceof z.ZodError) {
