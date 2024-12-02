@@ -1,16 +1,20 @@
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 export const GET = async (req: NextRequest) => {
   try {
-    const userId = req.headers.get("x-user-id");
+    const session = await getServerSession(authOptions);
 
-    if (!userId) {
+    if (!session || !session.user || !session.user.id) {
       return NextResponse.json(
         { success: false, message: "Unauthorized: No user ID provided" },
         { status: 403 }
       );
     }
+
+    const userId = session.user.id;
 
     const sessions = await prisma.chatSession.findMany({
       where: {
