@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Provider from "@/context/Provider";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Wanderlust - AI Generated Images",
@@ -47,7 +48,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Provider>
-        <body className="">{children}</body>
+        <body className="w-full h-screen flex">
+          <Sidebar />
+          <main className="w-full flex-1">{children}</main>
+        </body>
       </Provider>
     </html>
   );
