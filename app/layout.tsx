@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Provider>
-        <body className="bg-[#0c0f12]">
+        <body className="bg-[#060423]">
           <Sidebar />
           <Navbar />
           <main className="min-h-screen transition-all duration-300">

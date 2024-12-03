@@ -8,7 +8,7 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 bg-opacity-80 bg-[#0c0f12] flex justify-center items-center transition-all px-3 duration-300 ${
+      className={`fixed inset-0 bg-opacity-80 bg-[#060423] flex justify-center items-center transition-all px-3 duration-300 ${
         isOpen ? "md:ml-[13vw]" : "ml-0"
       }`}
     >
