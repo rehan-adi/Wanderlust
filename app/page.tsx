@@ -1,9 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useSidebarState } from "@/hooks/use-sidebar";
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const { isOpen } = useSidebarState();
 
   if (status === "loading") {
     return (
@@ -22,7 +24,11 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-[#0c0f12] text-white flex justify-center items-center min-h-screen w-full">
+    <div
+      className={`bg-[#0c0f12] text-white min-h-screen flex justify-center items-center transition-all duration-300 ${
+        isOpen ? "md:ml-[13vw]" : "ml-0"
+      }`}
+    >
       <div className="flex flex-col items-center">
         <img
           src={session.user?.image || "/default-avatar.png"}
