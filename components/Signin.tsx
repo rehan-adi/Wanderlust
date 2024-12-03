@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { useSidebarState } from "@/hooks/use-sidebar";
 
 const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -27,11 +28,17 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         {/* Sign-In Buttons */}
         <div className="space-y-3">
-          <button className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3">
+          <button
+            onClick={() => signIn("google")}
+            className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3"
+          >
             <img src="/google.svg" alt="google" className="text-[#5865f2]" />
             Continue With Google
           </button>
-          <button className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3">
+          <button
+            onClick={() => signIn("github")}
+            className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="inline-block"
@@ -44,7 +51,10 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </svg>
             <span>Continue With GitHub</span>
           </button>
-          <button className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3">
+          <button
+            onClick={() => signIn("discord")}
+            className="w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3"
+          >
             <svg
               className="inline-block text-[#5865f2]"
               fill="#5865F2"
