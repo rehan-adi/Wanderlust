@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 z-20 h-20 bg-[#060423] text-white transition-all duration-300 ${
+        className={`fixed top-0 z-20 h-[60px] bg-[#060423] text-white transition-all duration-300 ${
           isOpen ? "left-[13vw] md:left-[13vw]" : "left-0"
         } right-0`}
       >
