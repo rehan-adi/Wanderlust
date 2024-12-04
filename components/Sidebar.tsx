@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 h-screen z-30 flex flex-col transition-all bg-[#060423] duration-300 ${
+        className={`fixed top-0 left-0 h-screen z-50 flex flex-col transition-all bg-[#060423] duration-300 ${
           isOpen
             ? "md:w-[13vw] border-r border-white border-opacity-10 w-[55vw]"
             : "w-0 border-none"
@@ -46,7 +46,7 @@ const Sidebar: React.FC = () => {
 
       <button
         onClick={toggle}
-        className="fixed top-5 left-2 z-50 flex items-center justify-center p-2 text-center rounded-full transition-all md:text-base outline-[#09073a]/50 bg-emerald-900/20 text-emerald-50 hover:bg-emerald-900"
+        className="fixed top-3 left-2 z-50 flex items-center justify-center p-2 text-center rounded-full transition-all md:text-base outline-[#09073a]/50 bg-emerald-900/20 text-emerald-50 hover:bg-emerald-900"
       >
         {isOpen ? <PanelRightOpen size={24} /> : <PanelLeftOpen size={24} />}
       </button>
