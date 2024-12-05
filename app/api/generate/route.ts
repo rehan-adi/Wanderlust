@@ -54,13 +54,18 @@ export const POST = async (req: NextRequest) => {
       sessionId = newSession.id;
     }
 
-    const response = await axios.post(HUGGINGFACE_API_URL, prompt, {
-      headers: {
-        Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      responseType: "arraybuffer",
-    });
+    const response = await axios.post(
+      HUGGINGFACE_API_URL,
+      { inputs: prompt.prompt },
+      {
+        headers: {
+          Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        responseType: "arraybuffer",
+      }
+    );
+    console.log("Image Data", response.data);
 
     const imageBuffer = Buffer.from(response.data);
 
@@ -74,8 +79,10 @@ export const POST = async (req: NextRequest) => {
     }
 
     const imageUrl = cloudinaryResponse.secure_url;
+    console.log(imageUrl);
 
     const embedding = await getImageEmbedding(imageUrl);
+    console.log("Image embedding", embedding);
 
     const index = pinecone.Index("image-embeddings");
     const vectorId = `image-${Date.now()}`;
@@ -87,6 +94,7 @@ export const POST = async (req: NextRequest) => {
         values: embedding,
       },
     ]);
+    console.log("Success in creating image embedding");
 
     await prisma.chatHistory.create({
       data: {
@@ -95,17 +103,19 @@ export const POST = async (req: NextRequest) => {
         chatSessionId: sessionId,
       },
     });
+    console.log("Success in creating chat session");
 
     await prisma.images.create({
       data: {
         userId: userId,
         imageUrl,
-        prompt: prompt.prompt
+        prompt: prompt.prompt,
       },
-    })
+    });
+    console.log("Success in creating image record");
 
     return NextResponse.json({ imageUrl });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -115,7 +125,7 @@ export const POST = async (req: NextRequest) => {
         { status: 400 }
       );
     }
-    console.error("Unexpected error:", error);
+    console.error("Unexpected error:", error.response?.data || error.message);
     return NextResponse.json(
       { success: false, message: "Error generating image" },
       { status: 500 }
