@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSidebarState } from "@/hooks/use-sidebar";
 
@@ -9,7 +10,7 @@ interface ProfileData {
   name: string;
   email: string;
   image: string;
-  images: string[];
+  images: { id: string; imageUrl: string; prompt: string; createdAt: string }[];
 }
 
 const Profile = () => {
@@ -74,7 +75,7 @@ const Profile = () => {
         </div>
 
         {/* Images Section */}
-        <h2 className="text-2xl font-bold mt-10 mb-5 text-white">
+        <h2 className="text-2xl font-bold mt-10 mb-10 text-white">
           Generated Images
         </h2>
 
@@ -83,13 +84,28 @@ const Profile = () => {
             profileData.images.map((img, index) => (
               <div
                 key={index}
-                className="border border-white border-opacity-15 p-3 rounded-md"
+                className="border-b border-white py-2 border-opacity-15"
               >
+                {/* Image */}
                 <img
-                  src={img}
+                  src={img.imageUrl}
                   alt={`Generated Image ${index + 1}`}
-                  className="w-full h-48 object-cover rounded-md"
+                  className="w-full h-52 object-cover rounded-xl"
                 />
+
+                {/* Content Below the Image */}
+                <div className="py-4">
+                  <p className="text-white font-semibold mb-3">{img.prompt}</p>
+
+                  {/* Download Icon */}
+                  <a
+                    href={img.imageUrl}
+                    download
+                    className="text-white text-2xl hover:text-gray-400 block text-center"
+                  >
+                    <Download />
+                  </a>
+                </div>
               </div>
             ))
           ) : (
