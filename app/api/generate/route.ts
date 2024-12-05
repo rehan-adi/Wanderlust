@@ -65,7 +65,6 @@ export const POST = async (req: NextRequest) => {
         responseType: "arraybuffer",
       }
     );
-    console.log("Image Data", response.data);
 
     const imageBuffer = Buffer.from(response.data);
 
@@ -79,22 +78,6 @@ export const POST = async (req: NextRequest) => {
     }
 
     const imageUrl = cloudinaryResponse.secure_url;
-    console.log(imageUrl);
-
-    const embedding = await getImageEmbedding(imageUrl);
-    console.log("Image embedding", embedding);
-
-    const index = pinecone.Index("image-embeddings");
-    const vectorId = `image-${Date.now()}`;
-
-    await index.upsert([
-      {
-        id: vectorId,
-        metadata: { prompt: prompt.prompt, imageUrl },
-        values: embedding,
-      },
-    ]);
-    console.log("Success in creating image embedding");
 
     await prisma.chatHistory.create({
       data: {
@@ -103,7 +86,6 @@ export const POST = async (req: NextRequest) => {
         chatSessionId: sessionId,
       },
     });
-    console.log("Success in creating chat session");
 
     await prisma.images.create({
       data: {
@@ -112,7 +94,6 @@ export const POST = async (req: NextRequest) => {
         prompt: prompt.prompt,
       },
     });
-    console.log("Success in creating image record");
 
     return NextResponse.json({ imageUrl });
   } catch (error: any) {
