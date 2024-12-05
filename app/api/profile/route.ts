@@ -31,7 +31,7 @@ export const GET = async (req: NextRequest) => {
             createdAt: true,
           },
           orderBy: {
-            createdAt: 'desc', 
+            createdAt: "desc",
           },
         },
       },
@@ -48,10 +48,14 @@ export const GET = async (req: NextRequest) => {
       { success: true, user, message: "User profile retrieved successfully" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching user profile:", error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      {
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      },
       { status: 500 }
     );
   }

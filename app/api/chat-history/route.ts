@@ -35,10 +35,14 @@ export const POST = async (req: NextRequest) => {
       chatHistory,
       message: "Chat history fetched successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return NextResponse.json(
-      { success: false, message: "Internal Server Error", error },
+      {
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      },
       { status: 500 }
     );
   }

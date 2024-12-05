@@ -117,7 +117,11 @@ export const POST = async (req: NextRequest) => {
     }
     console.error("Unexpected error:", error.response?.data || error.message);
     return NextResponse.json(
-      { success: false, message: "Error generating image" },
+      {
+        success: false,
+        message: "Error generating image",
+        error: error.message,
+      },
       { status: 500 }
     );
   }

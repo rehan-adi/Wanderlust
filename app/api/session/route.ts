@@ -47,10 +47,14 @@ export const GET = async (req: NextRequest) => {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching sessions:", error);
     return NextResponse.json(
-      { success: false, message: "Internal Server error", error: error },
+      {
+        success: false,
+        message: "Internal Server error",
+        error: error.message,
+      },
       { status: 500 }
     );
   }
