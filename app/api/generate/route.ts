@@ -79,6 +79,12 @@ export const POST = async (req: NextRequest) => {
 
     const imageUrl = cloudinaryResponse.secure_url;
 
+    // embed the image
+
+    // index the image in Pinecone
+
+    // add the image to the index in Pinecone
+
     await prisma.chatHistory.create({
       data: {
         prompt: prompt.prompt,
@@ -95,7 +101,10 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json(
+      { success: true, imageUrl, message: "Image Generated successfuly" },
+      { status: 201 }
+    );
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
