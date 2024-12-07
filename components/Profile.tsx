@@ -40,22 +40,22 @@ const Profile = () => {
         <div className="max-w-3xl mx-auto py-10 px-6">
           {/* Page Header Skeleton */}
           <div className="pt-16 pb-14 text-center">
-            <h1 className="text-white font-semibold text-3xl">
+            <h1 className="text-black font-semibold text-3xl">
               Manage Profile
             </h1>
-            <p className="text-base font-medium mt-3 text-gray-400">
+            <p className="text-base font-medium mt-3 text-gray-700">
               Check your profile details and other things
             </p>
           </div>
 
           {/* Account Details Section Skeleton */}
-          <h2 className="text-xl font-bold mb-7 text-white">Account Details</h2>
+          <h2 className="text-xl font-bold mb-7 text-black">Account Details</h2>
 
           <div className="space-y-1">
             {Array.from({ length: 3 }).map((_, idx) => (
               <div
                 key={idx}
-                className="flex justify-between items-center border-t border-white border-opacity-15 py-3 md:flex-row gap-3 text-gray-300"
+                className="flex justify-between items-center border-t border-black border-opacity-15 py-3 md:flex-row gap-3 text-gray-300"
               >
                 <div className="h-4 w-20 bg-gray-700 bg-opacity-50 rounded animate-pulse"></div>
                 {idx < 2 ? (
@@ -68,7 +68,7 @@ const Profile = () => {
           </div>
 
           {/* Images Section Skeleton */}
-          <h2 className="text-xl font-bold mt-10 mb-7 text-white">
+          <h2 className="text-xl font-bold mt-10 mb-7 text-black">
             Generated Images
           </h2>
 
@@ -76,7 +76,7 @@ const Profile = () => {
             {Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
-                className="border-b border-white py-2 border-opacity-15"
+                className="border-b border-black py-2 border-opacity-15"
               >
                 {/* Image Skeleton */}
                 <div className="w-full h-52 bg-gray-700 bg-opacity-50 rounded-xl animate-pulse"></div>
