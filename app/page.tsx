@@ -1,99 +1,70 @@
-"use client";
+import Image from "next/image";
+import { Search } from "lucide-react";
 
-import axios from "axios";
-import { useState } from "react";
-import { Send } from "lucide-react";
-import { useSidebarState } from "@/hooks/use-sidebar";
+interface ImagesData {
+  imageUrl: string;
+  prompt: string;
+  user: [];
+  createdAt: Date;
+}
 
-export default function Home() {
-  const { isOpen } = useSidebarState();
-  const [inputText, setInputText] = useState("");
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{ text: string; isUser: boolean }[]>(
-    []
-  );
+async function getImages() {
+  try {
+    const response = await fetch("http://localhost:3000/api/explore");
+    const data = await response.json();
+    return data.images;
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    return [];
+  }
+}
 
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
-
-    setMessages((prev) => [...prev, { text: inputText, isUser: true }]);
-    setInputText("");
-
-    try {
-      const response = await axios.post("/api/generate", { prompt: inputText });
-
-      const imageUrl = response.data.imageUrl;
-
-      setMessages((prev) => [...prev, { text: imageUrl, isUser: false }]);
-
-      setGeneratedImage(imageUrl);
-    } catch (error) {
-      console.error("Error generating image:", error);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: "Failed to generate image. Please try again later.",
-          isUser: false,
-        },
-      ]);
-    }
-  };
+export default async function Explore() {
+  const images = await getImages();
 
   return (
-    <div
-      className={`bg-[#060423] text-white min-h-screen flex justify-center items-center transition-all duration-300 ${
-        isOpen ? "md:ml-[13vw]" : "ml-0"
-      }`}
-    >
-      <div className="flex flex-col justify-end items-center w-full py-8">
-        <div className="flex flex-col space-y-4 mb-16 max-w-2xl w-full overflow-y-auto px-4 py-8">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.isUser ? "justify-end" : "justify-start"
-              }`}
-            >
-              {message.isUser ? (
-                <div className="bg-[#5865F2] text-white py-2 px-4 rounded-2xl max-w-[70%] text-right">
-                  {message.text}
-                </div>
-              ) : message.text.startsWith("http") ? (
-                // Display generated image
-                <div className="bg-[#1b1b2f] p-4 rounded-2xl">
-                  <img
-                    src={message.text}
-                    alt="Generated"
-                    className="max-w-full rounded-lg"
-                  />
-                </div>
-              ) : (
-                // Display bot text response (if needed)
-                <div className="bg-[#1b1b2f] text-white py-2 px-4 rounded-2xl max-w-[70%]">
-                  {message.text}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+    <div className="bg-white text-black min-h-screen pt-24 pb-10 flex flex-col items-center justify-start px-4">
+      {/* Search bar */}
 
-        {/* Input and Send Button */}
-        <div className="flex gap-3 bg-[#060423] z-40 fixed bottom-0 py-5 justify-center w-full">
+      <div className="w-full max-w-2xl mb-10">
+        <div className="relative">
           <input
             type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Describe your image"
-            className="py-3 px-7 bg-[#1b1b2f] rounded-2xl border border-white border-opacity-20 md:w-[40vw] w-[75vw] text-white placeholder-opacity-50 focus:outline-none"
+            placeholder="Search for images..."
+            className="w-full px-4 py-3 pl-12 bg-white rounded-full text-gray-800 placeholder-gray-400 focus:outline-none border shadow-lg"
           />
-          <button
-            onClick={handleSend}
-            className="flex items-center gap-2 py-3 px-5 bg-white text-black rounded-2xl transition-transform border border-white border-opacity-20"
-          >
-            <Send size={18} />
-          </button>
+          <Search
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+            size={20}
+          />
         </div>
+      </div>
+
+      {/* Image grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        {images.length > 0 ? (
+          images.map((img: ImagesData, Index: number) => (
+            <div
+              key={Index}
+              className="relative group rounded-xl overflow-hidden shadow-lg hover:scale-105 transform transition-all duration-300"
+            >
+              <Image
+                src={img.imageUrl}
+                alt={img.prompt || "Generated Image"}
+                width={500}
+                height={500}
+                blurDataURL="data:..."
+                placeholder="blur"
+                className="object-cover w-full h-64 md:h-80 rounded-xl group-hover:opacity-80 transition-opacity duration-300"
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent opacity-80 text-white">
+                <p className="font-semibold truncate">{img.prompt}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-xl text-gray-400">No images found.</p>
+        )}
       </div>
     </div>
   );
