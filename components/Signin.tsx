@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { X, Loader2 } from "lucide-react";
-import { useSidebarState } from "@/hooks/use-sidebar";
 
 const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { isOpen } = useSidebarState();
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleSignIn = async (provider: string) => {
@@ -21,21 +19,17 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div
-      className={`fixed inset-0 bg-opacity-80 bg-[#060423] flex justify-center items-center transition-all px-3 duration-300 ${
-        isOpen ? "md:ml-[13vw]" : "ml-0"
-      }`}
-    >
-      <div className="bg-[#1F2228] p-6 rounded-2xl w-[400px] relative">
+    <div className="fixed inset-0 z-50 bg-opacity-70 bg-[#E0E0E0] flex justify-center items-center transition-all px-3 duration-300">
+      <div className="bg-[#F7F7F7] p-6 rounded-2xl w-[400px] relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white w-8 h-8 flex justify-center items-center hover:bg-zinc-700 hover:rounded-full transition"
+          className="absolute top-4 right-4 text-black w-8 h-8 flex justify-center items-center hover:bg-gray-200 hover:rounded-full transition"
         >
           <X size={20} />
         </button>
 
         {/* Header */}
-        <h2 className="text-xl font-semibold text-center text-white my-10">
+        <h2 className="text-xl font-semibold text-center text-black my-10">
           Sign In to continue
         </h2>
 
