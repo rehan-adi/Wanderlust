@@ -3,12 +3,10 @@
 import Link from "next/link";
 import Signin from "./Signin";
 import { useState } from "react";
-import { LogIn, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import { useSidebarState } from "@/hooks/use-sidebar";
 
 export default function Navbar() {
-  const { isOpen } = useSidebarState();
   const { data: session, status } = useSession();
 
   const [modal, setModal] = useState(false);
@@ -22,15 +20,11 @@ export default function Navbar() {
 
   return (
     <>
-      <nav
-        className={`fixed top-0 z-20 h-[60px] bg-[#060423] text-white transition-all duration-300 ${
-          isOpen ? "left-[13vw] md:left-[13vw]" : "left-0"
-        } right-0`}
-      >
-        <div className="flex h-full items-center justify-between md:px-20 ml-10 md:ml-0 px-6">
+      <nav className="fixed top-0 z-20 h-[60px] bg-white w-full text-black">
+        <div className="flex h-full items-center justify-between md:px-12 px-4">
           <div>
             <Link href="/">
-              <span className="font-semibold text-white">Wanderlust</span>
+              <span className="font-bold md:text-xl text-base text-black">Wanderlust</span>
             </Link>
           </div>
           <div className="flex items-center space-x-4 relative">
@@ -43,7 +37,7 @@ export default function Navbar() {
                 <img
                   src={session.user.image || "/default-avatar.png"}
                   alt="User Avatar"
-                  className="w-10 h-10 rounded-full cursor-pointer"
+                  className="w-8 h-8 rounded-full cursor-pointer"
                   onClick={toggleProfileMenu}
                 />
                 {profileMenu && (
@@ -68,9 +62,8 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={openSignin}
-                className="flex gap-2 items-center w-fit basis-1 justify-center p-2 px-5 min-w-max text-sm font-bold text-center rounded-full transition-all md:text-base outline-[#09073a]/50 bg-yellow-900/20 text-yellow-50 hover:bg-yellow-900"
+                className="bg-black text-white flex gap-3 text-sm font-semibold justify-center items-center rounded-lg py-2 px-5"
               >
-                <LogIn size={17} className="text-yellow-500" />
                 Sign In
               </button>
             )}
