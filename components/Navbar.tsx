@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Signin from "./Signin";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, User, LogIn } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
@@ -24,7 +24,9 @@ export default function Navbar() {
         <div className="flex h-full items-center justify-between md:px-12 px-4">
           <div>
             <Link href="/">
-              <span className="font-bold md:text-xl text-base text-black">Wanderlust</span>
+              <span className="font-bold md:text-xl text-base text-black">
+                Wanderlust
+              </span>
             </Link>
           </div>
           <div className="flex items-center space-x-4 relative">
@@ -42,18 +44,22 @@ export default function Navbar() {
                 />
                 {profileMenu && (
                   <div
-                    className="absolute top-2 right-0 mt-12 w-48 bg-[#060423] border border-white border-opacity-10 rounded-xl shadow-lg"
+                    className="absolute top-2 right-0 mt-12 w-48 bg-white border border-black border-opacity-10 rounded-xl shadow-lg"
                     onBlur={closeProfileMenu}
                   >
                     <ul className="p-2">
-                      <li className="px-4 py-2 hover:bg-[#13132a] rounded-xl cursor-pointer">
-                        <Link href="/profile">Profile</Link>
+                      <li className="px-4 py-2 rounded-xl hover:bg-gray-100 flex cursor-pointer">
+                        <Link href="/profile">
+                          <User size={17} className="inline-block mr-2"/>
+                          Profile
+                        </Link>
                       </li>
                       <li
-                        className="px-4 py-2 hover:bg-[#13132a] rounded-xl cursor-pointer text-red-500"
+                        className="px-4 py-2 rounded-xl hover:bg-gray-100 cursor-pointer text-red-500"
                         onClick={() => signOut()}
                       >
-                        Logout
+                         <LogIn size={17} className="inline-block mr-2"/>
+                        Log out
                       </li>
                     </ul>
                   </div>
