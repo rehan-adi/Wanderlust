@@ -3,7 +3,6 @@
 import axios from "axios";
 import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSidebarState } from "@/hooks/use-sidebar";
 
 interface ProfileData {
   id: string;
@@ -14,8 +13,6 @@ interface ProfileData {
 }
 
 const Profile = () => {
-  const { isOpen } = useSidebarState();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
@@ -39,7 +36,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#060423] transition-all duration-300">
+      <div className="min-h-screen bg-white">
         <div className="max-w-3xl mx-auto py-10 px-6">
           {/* Page Header Skeleton */}
           <div className="pt-16 pb-14 text-center">
@@ -98,32 +95,28 @@ const Profile = () => {
   }
 
   return (
-    <div
-      className={`min-h-screen bg-[#060423] transition-all duration-300 ${
-        isOpen ? "md:ml-[13vw]" : "ml-0"
-      } right-0`}
-    >
+    <div className="min-h-screen bg-white transition-all duration-300">
       <div className="max-w-3xl mx-auto py-10 px-6">
         <div className="pt-16 pb-14 text-center">
-          <h1 className="text-white font-semibold text-3xl">Manage Profile</h1>
-          <p className="text-base font-medium mt-3 text-gray-400">
+          <h1 className="text-black font-semibold text-3xl">Manage Profile</h1>
+          <p className="text-base font-medium mt-3 text-gray-700">
             Check your profile details and other things
           </p>
         </div>
 
         {/* Account Details Section */}
-        <h2 className="text-xl font-bold mb-7 text-white">Account Details</h2>
+        <h2 className="text-xl font-bold mb-7 text-black">Account Details</h2>
 
         <div className="space-y-1">
-          <div className="flex justify-between items-center border-t border-white border-opacity-15 py-3 md:flex-row gap-3 text-gray-300">
+          <div className="flex justify-between items-center border-t border-black border-opacity-15 py-3 md:flex-row gap-3 text-gray-700">
             <span>Email</span>
             <span>{profileData?.email}</span>
           </div>
-          <div className="flex justify-between items-center border-t border-white border-opacity-15 py-3 md:flex-row gap-3 text-gray-300">
+          <div className="flex justify-between items-center border-t border-black border-opacity-15 py-3 md:flex-row gap-3 text-gray-700">
             <span>Name</span>
             <span>{profileData?.name}</span>
           </div>
-          <div className="flex justify-between items-center border-t border-white border-opacity-15 py-3 md:flex-row gap-3 text-gray-300">
+          <div className="flex justify-between items-center border-t border-black border-opacity-15 py-3 md:flex-row gap-3 text-gray-700">
             <span>Profile Image</span>
             <div className="flex items-center gap-3">
               {profileData?.image ? (
@@ -133,14 +126,14 @@ const Profile = () => {
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
-                <span className="text-gray-500">No image available</span>
+                <span className="text-gray-700">No image available</span>
               )}
             </div>
           </div>
         </div>
 
         {/* Images Section */}
-        <h2 className="text-xl font-bold mt-10 mb-7 text-white">
+        <h2 className="text-xl font-bold mt-10 mb-7 text-black">
           Generated Images
         </h2>
 
@@ -149,7 +142,7 @@ const Profile = () => {
             profileData.images.map((img, index) => (
               <div
                 key={index}
-                className="border-b border-white py-2 border-opacity-15"
+                className="border-b border-black py-2 border-opacity-15"
               >
                 {/* Image */}
                 <img
@@ -160,21 +153,23 @@ const Profile = () => {
 
                 {/* Content Below the Image */}
                 <div className="py-4">
-                  <p className="text-white font-semibold mb-3 line-clamp-1">{img.prompt}</p>
+                  <p className="text-black font-semibold mb-3 line-clamp-1">
+                    {img.prompt}
+                  </p>
 
                   {/* Download Icon */}
                   <a
                     href={img.imageUrl}
                     download
-                    className="text-white mt-6 hover:text-gray-400 block text-center"
+                    className="text-black mt-6 block text-center"
                   >
-                    <Download size={18}/>
+                    <Download size={18} />
                   </a>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No images available</p>
+            <p className="text-gray-700">No images available</p>
           )}
         </div>
       </div>
