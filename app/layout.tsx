@@ -1,8 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Provider from "@/context/Provider";
-import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import Provider from "@/context/Provider";
 
 export const metadata: Metadata = {
   title: "Wanderlust - AI Generated Images",
@@ -49,8 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Provider>
-        <body className="bg-[#060423]">
-          <Sidebar />
+        <body>
           <Navbar />
           <main className="min-h-screen transition-all duration-300">
             {children}
