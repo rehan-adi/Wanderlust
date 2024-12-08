@@ -25,6 +25,20 @@ export function Images({ images }: ImageGridProps) {
     setSelectedImage(null);
   };
 
+  const downloadImage = (url: string, name: string) => {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        link.click();
+      })
+      .catch((error) => {
+        console.error("Error downloading image:", error);
+      });
+  };
+
   return (
     <div className="w-full max-w-6xl flex justify-center items-center">
       <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-1.5">
@@ -81,7 +95,9 @@ export function Images({ images }: ImageGridProps) {
                 {selectedImage.prompt}
               </p>
               <button
-                onClick={closeModal}
+                onClick={() =>
+                  downloadImage(selectedImage.imageUrl, "image.jpg")
+                }
                 className="mt-10 mb-4 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
               >
                 Downloade this Image
