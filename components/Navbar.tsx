@@ -48,7 +48,6 @@ export default function Navbar() {
                 height={28}
                 priority
                 blurDataURL="data:image/svg+xml;base64,..."
-                placeholder="blur"
               />
             </Link>
           </div>

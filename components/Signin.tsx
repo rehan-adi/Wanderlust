@@ -20,7 +20,7 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-opacity-70 bg-[#E0E0E0] flex justify-center items-center transition-all px-3 duration-300">
-      <div className="bg-[#F7F7F7] p-6 rounded-2xl w-[400px] relative">
+      <div className="bg-[#F7F7F7] p-6 border border-black border-opacity-40 rounded-2xl w-[400px] relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-black w-8 h-8 flex justify-center items-center hover:bg-gray-200 hover:rounded-full transition"

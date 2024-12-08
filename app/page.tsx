@@ -63,7 +63,7 @@ export default async function Explore() {
             </div>
           ))
         ) : (
-          <p className="text-center text-xl text-gray-400">No images found.</p>
+          <p className="text-center text-lg text-gray-700">No images found.</p>
         )}
       </div>
     </div>
