@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     "AI-powered images",
   ],
 
+  icons: {
+    icon: "/logo.svg",
+  },
+
   // Open Graph metadata (for social media sharing)
   openGraph: {
     type: "website",
