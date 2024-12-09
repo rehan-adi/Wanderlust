@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Provider from "@/context/Provider";
@@ -53,6 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Provider>
+        <Toaster position="top-right" richColors theme="dark" />
         <body>
           <Navbar />
           <main className="min-h-screen transition-all duration-300">

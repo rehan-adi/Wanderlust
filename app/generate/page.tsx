@@ -4,6 +4,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Send, Loader2, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Home() {
   const [inputText, setInputText] = useState("");
@@ -45,8 +46,13 @@ export default function Home() {
       );
 
       setGeneratedImage(imageUrl);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating image:", error);
+      const message =
+        error.response?.data?.message || "An error occurred. Please try again.";
+      toast.error("Error generating image", {
+        description: message,
+      });
 
       setMessages((prev) =>
         prev.map((message, index) =>

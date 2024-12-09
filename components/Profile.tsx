@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import { toast } from "sonner";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Download, Loader2, Trash2 } from "lucide-react";
@@ -54,12 +55,12 @@ const Profile = () => {
             prev ? { ...prev, images: updatedImages } : null
           );
           setSelectedImage(null);
-          console.log("Image deleted successfully");
+          toast.success("Image deleted successfully");
         } else {
           console.error("Profile data or images array is missing");
         }
       } else {
-        console.log("Failed to delete image");
+        toast.error("Failed to delete image");
       }
     } catch (error) {
       console.error("Error deleting image:", error);
@@ -249,7 +250,7 @@ const Profile = () => {
                     }
                     className="mt-7 mb-2 md:w-[90%] w-[97%] md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
                   >
-                      <Download size={18} className="inline-block mr-3" />
+                    <Download size={18} className="inline-block mr-3" />
                     Downloade this Image
                   </button>
                   <button
