@@ -21,7 +21,10 @@ export const POST = async (req: NextRequest) => {
 
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json(
-        { success: false, message: "Unauthorized: No user ID provided" },
+        {
+          success: false,
+          message: "Unauthorized: Please sign in to access this resource.",
+        },
         { status: 403 }
       );
     }
