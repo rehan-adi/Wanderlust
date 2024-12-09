@@ -12,7 +12,7 @@ const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY as string;
 const HUGGINGFACE_API_URL = process.env.HUGGINGFACE_API_URL as string;
 
 const promptValidation = z.object({
-  prompt: z.string().max(100, "Prompt must be less than 100 characters"),
+  prompt: z.string().max(400, "Prompt must be less than 400 characters"),
 });
 
 export const POST = async (req: NextRequest) => {
