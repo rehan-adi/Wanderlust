@@ -1,8 +1,8 @@
 "use client";
 
 import axios from "axios";
-import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Download, Trash2 } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -27,6 +27,29 @@ const Profile = () => {
       console.error("Error fetching profile data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteImage = async (id: string) => {
+    try {
+      const response = await axios.delete(`/api/delete-image/${id}`);
+      if (response.status === 200) {
+        if (profileData?.images) {
+          const updatedImages = profileData.images.filter(
+            (image) => image.id !== id
+          );
+          setProfileData((prev) =>
+            prev ? { ...prev, images: updatedImages } : null
+          );
+          console.log("Image deleted successfully");
+        } else {
+          console.error("Profile data or images array is missing");
+        }
+      } else {
+        console.log("Failed to delete image");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
     }
   };
 
@@ -152,19 +175,21 @@ const Profile = () => {
                 />
 
                 {/* Content Below the Image */}
-                <div className="py-4">
+                <div className="py-4 ">
                   <p className="text-black font-semibold mb-3 line-clamp-1">
                     {img.prompt}
                   </p>
-
-                  {/* Download Icon */}
-                  <a
-                    href={img.imageUrl}
-                    download
-                    className="text-black mt-6 block text-center"
-                  >
-                    <Download size={18} />
-                  </a>
+                  <div className="flex justify-between items-center">
+                    <button className="text-black mt-6 block text-center">
+                      <Download size={18} />
+                    </button>
+                    <button
+                      onClick={() => deleteImage(img.id)}
+                      className="text-black mt-6 block text-center"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
