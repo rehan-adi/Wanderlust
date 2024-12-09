@@ -1,8 +1,9 @@
 "use client";
 
 import axios from "axios";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Loader2, Trash2 } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -12,9 +13,19 @@ interface ProfileData {
   images: { id: string; imageUrl: string; prompt: string; createdAt: string }[];
 }
 
+interface ImagesData {
+  id: string;
+  imageUrl: string;
+  prompt: string;
+  user: [];
+  createdAt: Date;
+}
+
 const Profile = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImagesData | null>(null);
 
   const getProfileData = async () => {
     setLoading(true);
@@ -31,6 +42,7 @@ const Profile = () => {
   };
 
   const deleteImage = async (id: string) => {
+    setDeleteLoading(true);
     try {
       const response = await axios.delete(`/api/delete-image/${id}`);
       if (response.status === 200) {
@@ -41,6 +53,7 @@ const Profile = () => {
           setProfileData((prev) =>
             prev ? { ...prev, images: updatedImages } : null
           );
+          setSelectedImage(null);
           console.log("Image deleted successfully");
         } else {
           console.error("Profile data or images array is missing");
@@ -50,7 +63,31 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error deleting image:", error);
+    } finally {
+      setDeleteLoading(false);
     }
+  };
+
+  const downloadImage = (url: string, name: string) => {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        link.click();
+      })
+      .catch((error) => {
+        console.error("Error downloading image:", error);
+      });
+  };
+
+  const openModal = (img: any) => {
+    setSelectedImage(img);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
   };
 
   useEffect(() => {
@@ -160,41 +197,96 @@ const Profile = () => {
           Generated Images
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {profileData?.images && profileData.images.length > 0 ? (
-            profileData.images.map((img, index) => (
-              <div
-                key={index}
-                className="border-b border-black py-2 border-opacity-15"
-              >
-                {/* Image */}
-                <img
-                  src={img.imageUrl}
-                  alt={`Generated Image ${index + 1}`}
-                  className="w-full h-52 object-cover rounded-xl"
-                />
-
-                {/* Content Below the Image */}
-                <div className="py-4 ">
-                  <p className="text-black font-semibold mb-3 line-clamp-1">
-                    {img.prompt}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <button className="text-black mt-6 block text-center">
-                      <Download size={18} />
-                    </button>
-                    <button
-                      onClick={() => deleteImage(img.id)}
-                      className="text-black mt-6 block text-center"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+        <div className="w-full max-w-6xl flex justify-center items-center">
+          <div className="w-full grid grid-cols-2 lg:grid-cols-3 gap-1.5">
+            {profileData?.images && profileData.images.length > 0 ? (
+              profileData.images.map((img, index) => (
+                <div
+                  key={index}
+                  onClick={() => openModal(img)}
+                  className="relative group rounded-xl bg-white overflow-hidden shadow-lg cursor-pointer"
+                >
+                  <Image
+                    src={img.imageUrl}
+                    alt={img.prompt || "Generated Image"}
+                    width={444}
+                    height={444}
+                    blurDataURL="data:..."
+                    placeholder="blur"
+                    className="object-cover w-full h-56 md:h-72 rounded-xl group-hover:opacity-50 transition-opacity duration-300"
+                  />
+                  {/* Hover prompt */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p className="font-semibold truncate text-white">
+                      {img.prompt}
+                    </p>
                   </div>
                 </div>
+              ))
+            ) : (
+              <p className="text-start text-lg text-gray-700">
+                No images available.
+              </p>
+            )}
+          </div>
+
+          {/* Modal */}
+          {selectedImage && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-80 px-2 flex justify-center items-center z-50"
+              onClick={closeModal}
+            >
+              <div
+                className="bg-white rounded-2xl w-full max-w-md overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative">
+                  <Image
+                    src={selectedImage.imageUrl}
+                    alt={selectedImage.prompt || "Generated Image"}
+                    width={600}
+                    height={600}
+                    className="object-cover w-full h-96"
+                  />
+                </div>
+                <div className="px-4 text-center py-7">
+                  <p className="text-base text-black text-center font-medium">
+                    {selectedImage.prompt}
+                  </p>
+                  <button
+                    onClick={() =>
+                      downloadImage(selectedImage.imageUrl, "image.jpg")
+                    }
+                    className="mt-7 mb-2 w-[90%] md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
+                  >
+                    <span>
+                      <Download size={18} className="inline-block mr-3" />
+                    </span>
+                    Downloade this Image
+                  </button>
+                  <button
+                    onClick={() => deleteImage(selectedImage.id)}
+                    className="mt-2 mb-4 w-[90%] md:px-20 px-14 py-2 bg-[#edddd9] text-black font-semibold rounded-md"
+                  >
+                    {deleteLoading ? (
+                      <>
+                        <Loader2
+                          size={18}
+                          className="inline-block mr-4 animate-spin"
+                        />
+                        <Trash2 size={18} className="inline-block mr-3" />
+                        Delete this Image
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={18} className="inline-block mr-3" />
+                        Delete this Image
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            ))
-          ) : (
-            <p className="text-gray-700">No images available</p>
+            </div>
           )}
         </div>
       </div>
