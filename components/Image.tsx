@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { Download } from "lucide-react";
 
 interface ImagesData {
   imageUrl: string;
@@ -100,6 +101,7 @@ export function Images({ images }: ImageGridProps) {
                 }
                 className="mt-10 mb-4 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
               >
+                <Download size={18} className="inline-block mr-3" />
                 Downloade this Image
               </button>
             </div>

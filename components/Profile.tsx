@@ -132,20 +132,10 @@ const Profile = () => {
             Generated Images
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
             {Array.from({ length: 6 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="border-b border-black py-2 border-opacity-15"
-              >
-                {/* Image Skeleton */}
+              <div key={idx} className="">
                 <div className="w-full h-52 bg-gray-700 bg-opacity-50 rounded-xl animate-pulse"></div>
-
-                {/* Content Below the Image */}
-                <div className="py-4">
-                  <div className="h-4 w-48 bg-gray-700 bg-opacity-50 rounded animate-pulse mb-3"></div>
-                  <div className="h-8 w-8 mt-6 bg-gray-700 bg-opacity-50 rounded-full animate-pulse"></div>
-                </div>
               </div>
             ))}
           </div>
@@ -257,16 +247,14 @@ const Profile = () => {
                     onClick={() =>
                       downloadImage(selectedImage.imageUrl, "image.jpg")
                     }
-                    className="mt-7 mb-2 w-[90%] md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
+                    className="mt-7 mb-2 md:w-[90%] w-[97%] md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
                   >
-                    <span>
                       <Download size={18} className="inline-block mr-3" />
-                    </span>
                     Downloade this Image
                   </button>
                   <button
                     onClick={() => deleteImage(selectedImage.id)}
-                    className="mt-2 mb-4 w-[90%] md:px-20 px-14 py-2 bg-[#edddd9] text-black font-semibold rounded-md"
+                    className="mt-2 mb-4 md:w-[90%] w-[97%] md:px-20 px-14 py-2 bg-[#edddd9] text-black font-semibold rounded-md"
                   >
                     {deleteLoading ? (
                       <>
