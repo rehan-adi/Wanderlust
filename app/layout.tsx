@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Provider from "@/context/Provider";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Wanderlust - AI Generated Images",
@@ -57,6 +58,7 @@ export default function RootLayout({
           <main className="min-h-screen transition-all duration-300">
             {children}
           </main>
+          <Footer />
         </body>
       </Provider>
     </html>
