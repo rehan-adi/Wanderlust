@@ -3,13 +3,14 @@ import axios from "axios";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { pinecone } from "../../../lib/pinecone";
-import { getImageEmbedding } from "@/utils/embedding";
+import { getTextEmbedding } from "@/utils/embedding";
 import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/options";
 
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY as string;
-const HUGGINGFACE_API_URL = process.env.HUGGINGFACE_API_URL as string;
+const HUGGINGFACE_IMAGE_MODEL_API_URL = process.env
+  .HUGGINGFACE_IMAGE_MODEL_API_URL as string;
 
 const promptValidation = z.object({
   prompt: z.string().max(400, "Prompt must be less than 400 characters"),
@@ -58,7 +59,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     const response = await axios.post(
-      HUGGINGFACE_API_URL,
+      HUGGINGFACE_IMAGE_MODEL_API_URL,
       { inputs: prompt.prompt },
       {
         headers: {
@@ -82,11 +83,17 @@ export const POST = async (req: NextRequest) => {
 
     const imageUrl = cloudinaryResponse.secure_url;
 
-    // embed the image
+    const embedding = await getTextEmbedding(prompt.prompt);
+    const index = pinecone.Index("image-embeddings");
+    const vectorId = `image-${Date.now()}`;
 
-    // index the image in Pinecone
-
-    // add the image to the index in Pinecone
+    await index.upsert([
+      {
+        id: vectorId,
+        metadata: { prompt: prompt.prompt, imageUrl },
+        values: embedding,
+      },
+    ]);
 
     await prisma.chatHistory.create({
       data: {
