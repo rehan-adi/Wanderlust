@@ -53,16 +53,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Provider>
-        <Toaster position="top-right" richColors theme="dark" />
-        <body>
+      <body>
+        <Provider>
+          <Toaster position="top-right" richColors theme="dark" />
           <Navbar />
           <main className="min-h-screen transition-all duration-300">
             {children}
           </main>
           <Footer />
-        </body>
-      </Provider>
+        </Provider>
+      </body>
     </html>
   );
 }
