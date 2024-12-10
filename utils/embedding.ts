@@ -1,29 +1,24 @@
-import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export const getImageEmbedding = async (
-  imageBuffer: Buffer
-): Promise<number[]> => {
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY as string;
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+
+export const getTextEmbedding = async (prompt: string): Promise<number[]> => {
   try {
-    const base64Image = imageBuffer.toString("base64");
-
-    const response = await axios.post(
-      "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32",
-      base64Image,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("Embedding Response:", response.data);
-    return response.data.embedding;
+    const response = await model.embedContent(prompt);
+    return response.embedding.values;
   } catch (error: any) {
-    console.error(
-      "Error generating embedding:",
-      error.response?.data || error.message
-    );
-    throw new Error("Failed to get image embedding");
+    if (error.response) {
+      console.error(
+        "API Response Error:",
+        error.response.status,
+        error.response.data
+      );
+    } else {
+      console.error("Request Error:", error.message);
+    }
+    throw new Error("Failed to get text embedding");
   }
 };
