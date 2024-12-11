@@ -1,5 +1,6 @@
 "use client";
 
+import Search from "./Search";
 import Image from "next/image";
 import { useState } from "react";
 import { Download } from "lucide-react";
@@ -41,8 +42,11 @@ export function Images({ images }: ImageGridProps) {
   };
 
   return (
-    <div className="w-full max-w-6xl flex justify-center items-center">
-      <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-1.5">
+    <div className="w-full max-w-6xl relative flex justify-center items-center">
+      <div className="top-4 absolute">
+        <Search />
+      </div>
+      <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-28 gap-1.5">
         {images.length > 0 ? (
           images.map((img, index) => (
             <div
@@ -99,7 +103,7 @@ export function Images({ images }: ImageGridProps) {
                 onClick={() =>
                   downloadImage(selectedImage.imageUrl, "image.jpg")
                 }
-                className="mt-10 mb-4 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
+                className="mt-8 mb-2 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
               >
                 <Download size={18} className="inline-block mr-3" />
                 Downloade this Image
