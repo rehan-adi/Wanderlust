@@ -38,7 +38,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 z-20 h-[60px] bg-white border border-black border-opacity-10 w-full text-black">
-        <div className="flex h-full items-center justify-between md:px-20 px-4">
+        <div className="flex h-full items-center justify-between md:px-8 lg:px-20 px-4">
           <div>
             <Link href="/" className="flex-shrink-0">
               <Image
