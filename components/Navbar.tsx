@@ -3,10 +3,10 @@
 import Link from "next/link";
 import Signin from "./Signin";
 import Image from "next/image";
-import { User, LogIn, Settings, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { User, LogIn, Settings, Pencil } from "lucide-react";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -89,6 +89,12 @@ export default function Navbar() {
                           <Link href="/profile">
                             <User size={17} className="inline-block mr-2" />
                             Profile
+                          </Link>
+                        </li>
+                        <li className="px-4 py-2 rounded-xl hover:bg-gray-100 font-medium flex cursor-pointer">
+                          <Link href="/edit">
+                            <Pencil size={16} className="inline-block mr-2" />
+                            Edit Image
                           </Link>
                         </li>
                         <li className="px-4 py-2 rounded-xl hover:bg-gray-100 font-medium flex cursor-pointer">
