@@ -1,10 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import axios from "axios";
+import { useState, useEffect } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
+type ChatHistory = {
+  prompt: string;
+  imageUrl: string;
+  createdAt: string;
+};
+
+type ChatSession = {
+  id: string;
+  chatHistory: ChatHistory[];
+};
+
 const Settings = () => {
-  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [imageLen, setImageLen] = useState<number>();
+  const [showHistory, setShowHistory] = useState<boolean>(true);
+  const [chatSessions, setChatSessions] = useState<ChatSession[] | undefined>(
+    undefined
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getChatHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/chat-history");
+      if (response.data.success) {
+        setChatSessions(response.data.sessions);
+        setImageLen(response.data.imageCount);
+      } else {
+        setError("Failed to fetch chat history.");
+      }
+    } catch (error) {
+      setError("Failed to fetch chat history.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getChatHistory();
+  }, []);
+
+  // Skeleton loader component
+  const SkeletonLoader = () => (
+    <div className="animate-pulse space-y-4">
+      <div className="h-6 bg-gray-100 rounded w-1/2"></div>
+      <div className="h-6 bg-gray-100 rounded w-2/3"></div>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 py-8">
@@ -14,12 +62,18 @@ const Settings = () => {
       <section className="mt-8 bg-white shadow-lg border rounded-xl p-6">
         <h2 className="text-2xl font-semibold text-black">Data Usage</h2>
         <div className="mt-4 space-y-2">
-          <p className="text-gray-700">
-            Total images generated: <strong>25</strong>
-          </p>
-          <p className="text-gray-700">
-            Remaining credits: <strong>Unlimited</strong>
-          </p>
+          {loading ? (
+            <SkeletonLoader />
+          ) : (
+            <>
+              <p className="text-gray-700">
+                Total images generated: <strong>{imageLen}</strong>
+              </p>
+              <p className="text-gray-700">
+                Remaining credits: <strong>Unlimited</strong>
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -49,17 +103,40 @@ const Settings = () => {
             showHistory ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           } overflow-hidden`}
         >
-          {showHistory && (
-            <div className="mt-6 border-t border-gray-300 pt-4">
-              <ul className="space-y-3">
-                <li className="flex justify-between items-center">
-                  <span className="text-gray-800">
-                    Prompt: Sunset over the mountains
-                  </span>
-                  <button className="text-sm text-blue-500">View</button>
-                </li>
-              </ul>
-            </div>
+          {loading ? (
+            <SkeletonLoader />
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            showHistory && (
+              <div className="mt-6 border-t border-gray-300 pt-4">
+                {chatSessions && chatSessions.length > 0 ? (
+                  chatSessions.map((session) => (
+                    <div key={session.id} className="mt-4">
+                      {session.chatHistory.length > 0 ? (
+                        <ul className="space-y-3">
+                          <li className="flex justify-between items-center">
+                            <span className="text-gray-800">
+                              {session.chatHistory[0].prompt}
+                            </span>
+                            <button
+                              onClick={() => alert("Navigate to chat detail")}
+                              className="text-sm text-blue-500"
+                            >
+                              View
+                            </button>
+                          </li>
+                        </ul>
+                      ) : (
+                        <p>No chat history available</p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p>No chat sessions found.</p>
+                )}
+              </div>
+            )
           )}
         </div>
       </section>
