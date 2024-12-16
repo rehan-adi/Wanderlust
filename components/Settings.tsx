@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
@@ -16,6 +17,8 @@ type ChatSession = {
 };
 
 const Settings = () => {
+  const router = useRouter();
+
   const [imageLen, setImageLen] = useState<number>();
   const [showHistory, setShowHistory] = useState<boolean>(true);
   const [chatSessions, setChatSessions] = useState<ChatSession[] | undefined>(
@@ -28,6 +31,7 @@ const Settings = () => {
     try {
       setLoading(true);
       const response = await axios.get("/api/chat-history");
+      console.log(response.data);
       if (response.data.success) {
         setChatSessions(response.data.sessions);
         setImageLen(response.data.imageCount);
@@ -42,6 +46,10 @@ const Settings = () => {
     }
   };
 
+  const handleViewClick = (id: string) => {
+    router.push(`/chat-history/${id}`);
+  };
+
   useEffect(() => {
     getChatHistory();
   }, []);
@@ -49,8 +57,8 @@ const Settings = () => {
   // Skeleton loader component
   const SkeletonLoader = () => (
     <div className="animate-pulse space-y-4">
-      <div className="h-6 bg-gray-100 rounded w-1/2"></div>
-      <div className="h-6 bg-gray-100 rounded w-2/3"></div>
+      <div className="h-6 bg-gray-600 bg-opacity-50 rounded w-1/2"></div>
+      <div className="h-6 bg-gray-600 bg-opacity-50 rounded w-2/3"></div>
     </div>
   );
 
@@ -115,13 +123,13 @@ const Settings = () => {
                     <div key={session.id} className="mt-4">
                       {session.chatHistory.length > 0 ? (
                         <ul className="space-y-3">
-                          <li className="flex justify-between items-center">
-                            <span className="text-gray-800">
+                          <li className="flex justify-between items-start">
+                            <span className="text-gray-800 w-[80%]">
                               {session.chatHistory[0].prompt}
                             </span>
                             <button
-                              onClick={() => alert("Navigate to chat detail")}
-                              className="text-sm text-blue-500"
+                              onClick={() => handleViewClick(session.id)}
+                              className="text-sm font-semibold underline text-blue-500"
                             >
                               View
                             </button>
