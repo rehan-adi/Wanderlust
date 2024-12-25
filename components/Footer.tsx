@@ -10,9 +10,9 @@ const Footer = () => {
         className="flex justify-center font-secondary text-xl items-center gap-3"
       >
         <BrainCircuit size={25} />
-        <span className="mt-1 mb-3 md:mb-0">Wanderlust AI</span>
+        <span className="">Wanderlust AI</span>
       </Link>
-      <p className="text-sm font-semibold">
+      <p className="text-sm mt-3 md:mt-0 font-semibold">
         &copy; {new Date().getFullYear()} Wanderlust. All rights reserved.
       </p>
     </div>
