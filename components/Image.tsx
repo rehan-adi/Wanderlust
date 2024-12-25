@@ -92,7 +92,7 @@ export function Images({ images }: ImageGridProps) {
                 alt={selectedImage.prompt || "Generated Image"}
                 width={600}
                 height={600}
-                className="object-cover w-full h-96"
+                className="object-cover w-full h-[365px]"
               />
             </div>
             <div className="px-4 text-center py-7">
