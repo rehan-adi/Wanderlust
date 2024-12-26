@@ -19,8 +19,8 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-opacity-70 bg-[#E0E0E0] flex justify-center items-center transition-all px-3 duration-300">
-      <div className="bg-[#F7F7F7] p-6 border border-black border-opacity-40 rounded-2xl w-[400px] relative">
+    <div className="fixed inset-0 z-50 bg-opacity-85 bg-[#E0E0E0] flex justify-center items-center transition-all px-3 duration-300">
+      <div className="bg-[#F7F7F7] p-6 border shadow-md rounded-2xl w-[400px] relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-black w-8 h-8 flex justify-center items-center hover:bg-gray-200 hover:rounded-full transition"
@@ -38,10 +38,10 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <button
             disabled={loading === "google"}
             onClick={() => handleSignIn("google")}
-            className={`w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
+            className={`w-full px-4 py-3.5 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
               loading === "google"
                 ? "bg-opacity-50 cursor-not-allowed"
-                : "opacity-100"
+                : "opacity-100 hover:bg-[#22252B] active:bg-[#131518]"
             }`}
           >
             {loading === "google" ? (
@@ -69,10 +69,10 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <button
             disabled={loading !== null}
             onClick={() => handleSignIn("github")}
-            className={`w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
+            className={`w-full px-4 py-3.5 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
               loading === "github"
                 ? "bg-opacity-50 cursor-not-allowed"
-                : "opacity-100"
+                : "opacity-100 hover:bg-[#22252B] active:bg-[#131518]"
             }`}
           >
             {loading === "github" ? (
@@ -110,10 +110,10 @@ const Signin: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <button
             onClick={() => handleSignIn("discord")}
             disabled={loading !== null}
-            className={`w-full px-4 py-4 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
+            className={`w-full px-4 py-3.5 bg-[#16181D] border border-white border-opacity-10 text-white font-semibold rounded-xl flex justify-center items-center gap-3 transition-opacity duration-300 ${
               loading === "discord"
                 ? "bg-opacity-50 cursor-not-allowed"
-                : "opacity-100"
+                : "opacity-100 hover:bg-[#22252B] active:bg-[#131518]"
             }`}
           >
             {loading === "discord" ? (
