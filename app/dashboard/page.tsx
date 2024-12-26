@@ -29,7 +29,7 @@ const Dashboard = () => {
             asChild
             className="bg-[#0f172a] text-lg font-semibold py-5 text-white w-full hover:bg-[#1e293b]"
           >
-            <Link href="/dashboard">
+            <Link href="/dashboard/chat">
               Flash <ExternalLink size={30} className="inline-block ml-2" />{" "}
             </Link>
           </Button>
@@ -57,7 +57,7 @@ const Dashboard = () => {
             asChild
             className="bg-[#0f172a] text-lg font-semibold py-5 text-white w-full hover:bg-[#1e293b]"
           >
-            <Link href="/generate">
+            <Link href="/dashboard/generate">
               Imagen <ExternalLink size={30} className="inline-block ml-2" />{" "}
             </Link>
           </Button>
