@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   return (
-    <div className="bg-gray-50 min-h-screen text-gray-800 flex justify-center items-center flex-col lg:flex-row gap-8 py-8 px-4">
+    <div className="bg-white min-h-screen text-gray-800 flex justify-center items-center flex-col lg:flex-row gap-8 py-8 px-4">
       <div className="w-full md:w-[27vw] bg-white border shadow-lg rounded-lg p-6">
         <div className="w-full aspect-w-16 aspect-h-9 relative mb-6 overflow-hidden rounded-md">
           <Image
@@ -57,7 +57,7 @@ const Dashboard = () => {
             asChild
             className="bg-[#0f172a] text-lg font-semibold py-5 text-white w-full hover:bg-[#1e293b]"
           >
-            <Link href="/dashboard">
+            <Link href="/generate">
               Imagen <ExternalLink size={30} className="inline-block ml-2" />{" "}
             </Link>
           </Button>
