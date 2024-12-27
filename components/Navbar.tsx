@@ -16,9 +16,9 @@ import {
   X,
   Image as ImageIcon,
   LayoutDashboard,
-  Coins,
   QrCode,
   ArrowUpRight,
+  CreditCard,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -116,7 +116,7 @@ export default function Navbar() {
                         </li>
                         <li className="px-4 py-2 rounded-xl hover:bg-gray-100 font-medium flex cursor-pointer">
                           <Link href="/pricing">
-                            <Coins size={17} className="inline-block mr-2" />
+                            <CreditCard size={17} className="inline-block mr-2" />
                             Pricing
                           </Link>
                         </li>
@@ -204,7 +204,7 @@ export default function Navbar() {
                 href="/pricing"
                 className="flex items-center gap-2 font-medium text-lg"
               >
-                <Coins size={20} />
+                <CreditCard size={20} />
                 Pricing
               </Link>
               <Link
