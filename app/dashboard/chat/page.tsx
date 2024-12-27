@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -16,12 +19,12 @@ import {
   UserCheck,
   FileText,
   Zap,
-  Image,
+  Image as ImageIcon,
   Mic,
   Sparkles,
-  PanelLeftOpen,
   PlusCircle,
   QrCode,
+  BrainCircuit,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -35,80 +38,123 @@ interface SidebarProps {
 }
 
 function LeftSidebar({ onNewChat }: SidebarProps) {
-  const previousChats = [
-    { id: 1, title: "Chat about React" },
-    { id: 2, title: "AI Basics Discussion" },
-    { id: 3, title: "Code Review Session" },
-  ];
-
   return (
-    <div className="w-64 h-screen bg-background border-r p-4 flex flex-col fixed left-0 top-0">
-      <Button
-        variant="outline"
-        className="mb-4 w-full justify-start"
-        onClick={onNewChat}
-      >
-        <PlusCircle className="mr-2 h-4 w-4" />
-        New Chat
-      </Button>
-      <div className="flex-grow overflow-y-auto">
-        {previousChats.map((chat) => (
-          <Button
-            key={chat.id}
-            variant="ghost"
-            className="w-full justify-start mb-2"
+    <>
+      <div className="w-64 h-screen bg-background border-r flex flex-col fixed left-0 top-0">
+        <div className="flex items-center border-b py-4 mb-6 justify-center">
+          <Link
+            href="/"
+            className="flex justify-center font-secondary text-xl items-center gap-3"
           >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            {chat.title}
+            <BrainCircuit size={25} />
+            <span className="mt-1">Wanderlust AI</span>
+          </Link>
+        </div>
+        <div className="px-4">
+          <Button
+            variant="outline"
+            className="mb-4 w-full py-5 justify-start"
+            onClick={onNewChat}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            New Chat
           </Button>
-        ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 function RightSidebar() {
+  const { data: session, status } = useSession();
+
   return (
-    <div className="w-64 h-screen bg-background border-l p-4 flex flex-col fixed right-0 top-0">
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Bot className="w-4 h-4" />
-        Characters
-      </Button>
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Settings className="w-4 h-4" />
-        Model Settings
-      </Button>
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Zap className="w-4 h-4" />
-        AI Assistants
-      </Button>
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Image className="w-4 h-4" />
-        Image Generation
-      </Button>
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Mic className="w-4 h-4" />
-        Voice Interaction
-      </Button>
-      <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-        <Sparkles className="w-4 h-4" />
-        Creative Writing
-      </Button>
-      <div className="mt-auto">
-        <Button variant="outline" className="gap-2 w-full justify-start mb-2">
-          <CreditCard className="w-4 h-4" />
-          Buy Credits
+    <div className="w-64 h-screen bg-background border-l flex flex-col fixed right-0 top-0">
+      <div className="border-b py-3 mb-6">
+        {session?.user?.image ? (
+          <div className="flex justify-end px-4">
+            <Image
+              src={session.user.image}
+              alt="User Avatar"
+              width={40}
+              height={40}
+              blurDataURL="data:..."
+              placeholder="blur"
+              className="rounded-full cursor-pointer"
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
+      <div className="px-4">
+        <Button
+          variant="outline"
+          className="gap-2 py-5 w-full justify-start mb-2"
+        >
+          <Bot className="w-4 h-4" />
+          Characters
           <span className="text-xs bg-primary/10 px-2 py-0.5 rounded ml-auto">
-            Cheap
+            Comming
           </span>
         </Button>
-        <Button variant="outline" className="gap-2 w-full justify-start">
-          <LayoutDashboard className="w-4 h-4" />
-          Dashboard
-          <span className="text-xs bg-primary/10 px-2 py-0.5 rounded ml-auto">
-            New
-          </span>
+        <Link href="/settings">
+          <Button
+            variant="outline"
+            className="gap-2 py-5 w-full justify-start mb-2"
+          >
+            <Settings className="w-4 h-4" />
+            Settings
+          </Button>
+        </Link>
+        <Link href="/dashboard">
+          <Button
+            variant="outline"
+            className="gap-2 py-5 w-full justify-start mb-2"
+          >
+            <Zap className="w-4 h-4" />
+            AI Assistants
+          </Button>
+        </Link>
+        <Link href="/dashboard/generate">
+          <Button
+            variant="outline"
+            className="gap-2 py-5 w-full justify-start mb-2"
+          >
+            <ImageIcon className="w-4 h-4" />
+            Image Generation
+          </Button>
+        </Link>
+        <Button
+          variant="outline"
+          className="gap-2 py-5 w-full justify-start mb-2"
+        >
+          <Sparkles className="w-4 h-4" />
+          Creative Writing
         </Button>
+        <div className="md:mt-[250px] mt-[225px]">
+          <Link href="/pricing">
+            <Button
+              variant="outline"
+              className="gap-2 py-5 w-full justify-start mb-2"
+            >
+              <CreditCard className="w-4 h-4" />
+              Pricing
+              <span className="text-xs bg-primary/10 px-2 py-0.5 rounded ml-auto">
+                Cheap
+              </span>
+            </Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="gap-2 py-5 w-full justify-start"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -168,14 +214,13 @@ export default function Chatpage() {
 
       {/* Main Content */}
       <div className="flex-grow flex flex-col items-center justify-center px-4 md:px-0">
-
         {/* Mobile Navigation */}
         <div className="md:hidden fixed top-0 left-0 right-0 border-b py-4 bg-background flex justify-between items-center px-4 z-50">
           <Sheet open={isLeftOpen} onOpenChange={setIsLeftOpen}>
             <SheetTrigger asChild>
               <QrCode size={20} />
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[340px]">
+            <SheetContent side="left" className="w-64">
               <div className="py-4">
                 <LeftSidebar onNewChat={handleNewChat} />
               </div>
@@ -186,11 +231,8 @@ export default function Chatpage() {
             <SheetTrigger asChild>
               <Settings size={20} />
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-64"
-            >
-                <RightSidebar />
+            <SheetContent side="right" className="w-64">
+              <RightSidebar />
             </SheetContent>
           </Sheet>
         </div>
