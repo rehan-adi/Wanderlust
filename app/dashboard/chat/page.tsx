@@ -20,7 +20,6 @@ import {
   FileText,
   Zap,
   Image as ImageIcon,
-  Mic,
   Sparkles,
   PlusCircle,
   QrCode,
@@ -29,6 +28,7 @@ import {
 
 interface ChatMessage {
   id: number;
+  model: string;
   text: string;
   isUser: boolean;
 }
@@ -179,6 +179,7 @@ export default function Chatpage() {
       const newMessage: ChatMessage = {
         id: Date.now(),
         text: message,
+        model: "Flask",
         isUser: true,
       };
       setChatMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -188,10 +189,10 @@ export default function Chatpage() {
         setChatStarted(true);
       }
 
-      // Simulate AI response
       setTimeout(() => {
         const aiResponse: ChatMessage = {
           id: Date.now() + 1,
+          model: "Flask",
           text: "This is a simulated AI response.",
           isUser: false,
         };
@@ -280,13 +281,39 @@ export default function Chatpage() {
             {chatMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`mb-2 p-2 rounded-lg ${
-                  msg.isUser
-                    ? "bg-primary text-primary-foreground ml-auto"
-                    : "bg-muted"
-                } max-w-[80%] ${msg.isUser ? "text-right" : "text-left"}`}
+                className={`flex items-center mb-4 ${
+                  msg.isUser ? "justify-end" : "justify-start"
+                }`}
               >
-                {msg.text}
+                {/* AI Bot Avatar, Model Name, and Message */}
+                {!msg.isUser && (
+                  <div className="flex flex-col items-start">
+                    <div className="flex items-center mb-2">
+                      <Image
+                        src="/images/man.png"
+                        alt="AI Bot"
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    </div>
+                    {msg.model && (
+                      <span className="text-sm text-gray-500 font-medium mb-1">
+                        {msg.model}
+                      </span>
+                    )}
+                    <div className="p-3 bg-gray-200 rounded-lg text-black font-semibold max-w-[80%]">
+                      {msg.text}
+                    </div>
+                  </div>
+                )}
+
+                {/* User Message */}
+                {msg.isUser && (
+                  <div className="p-3 bg-blue-500 text-white rounded-lg font-semibold max-w-[80%] ml-auto">
+                    {msg.text}
+                  </div>
+                )}
               </div>
             ))}
           </div>
