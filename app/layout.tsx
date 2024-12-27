@@ -1,9 +1,8 @@
 import "./globals.css";
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
 import Provider from "@/context/Provider";
-import Footer from "@/components/Footer";
+import ConditionalLayout from "@/context/Layout";
 
 export const metadata: Metadata = {
   title: "Wanderlust - AI Generated Images",
@@ -56,11 +55,7 @@ export default function RootLayout({
       <body>
         <Provider>
           <Toaster position="top-right" richColors theme="dark" />
-          <Navbar />
-          <main className="min-h-screen transition-all duration-300">
-            {children}
-          </main>
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </Provider>
       </body>
     </html>
