@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download, Edit, Fullscreen, Info } from "lucide-react";
+import { Download, Edit, Fullscreen, Info, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ImageGenerator() {
@@ -99,10 +99,10 @@ export default function ImageGenerator() {
             </div>
 
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
-              <Info size={17} className="mt-0.5"/>
+              <Info size={17} className="mt-0.5" />
               <p>
-                info: Image generation may take a few seconds. Thank you
-                for your patience!
+                info: Image generation may take a few seconds. Thank you for
+                your patience!
               </p>
             </div>
 
@@ -112,7 +112,14 @@ export default function ImageGenerator() {
               className="w-full py-5"
               size="lg"
             >
-              {loading ? "Generating..." : "Generate"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 animate-spin w-5 h-5" />{" "}
+                  Generating...
+                </>
+              ) : (
+                "Generate"
+              )}
             </Button>
           </CardContent>
         </Card>
