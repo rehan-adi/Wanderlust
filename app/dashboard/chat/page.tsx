@@ -40,7 +40,7 @@ interface SidebarProps {
 function LeftSidebar({ onNewChat }: SidebarProps) {
   return (
     <>
-      <div className="w-64 h-screen bg-background border-r flex flex-col fixed left-0 top-0">
+      <div className="w-64 h-screen bg-background border-r z-50 flex flex-col fixed left-0 top-0">
         <div className="flex items-center border-b py-4 mb-6 justify-center">
           <Link
             href="/"
@@ -69,7 +69,7 @@ function RightSidebar() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="w-64 h-screen bg-background border-l flex flex-col fixed right-0 top-0">
+    <div className="w-64 h-screen bg-background border-l z-50 flex flex-col fixed right-0 top-0">
       <div className="border-b py-3 mb-6">
         {session?.user?.image ? (
           <div className="flex justify-end px-4">
@@ -192,8 +192,8 @@ export default function Chatpage() {
       setTimeout(() => {
         const aiResponse: ChatMessage = {
           id: Date.now() + 1,
-          model: "Flask",
-          text: "This is a simulated AI response.",
+          model: "Flash",
+          text: "This is a simulated AI response from flux Ai, that can build any project you want in a one prompt and a one click ",
           isUser: false,
         };
         setChatMessages((prevMessages) => [...prevMessages, aiResponse]);
@@ -275,7 +275,7 @@ export default function Chatpage() {
           {/* Chat Messages */}
           <div
             className={`w-full flex-grow overflow-y-auto mb-4 ${
-              chatStarted ? "mt-20 md:mt-0" : ""
+              chatStarted ? "mt-10 mb-20 md:mt-0" : ""
             }`}
           >
             {chatMessages.map((msg) => (
@@ -288,21 +288,23 @@ export default function Chatpage() {
                 {/* AI Bot Avatar, Model Name, and Message */}
                 {!msg.isUser && (
                   <div className="flex flex-col items-start">
-                    <div className="flex items-center mb-2">
-                      <Image
-                        src="/images/man.png"
-                        alt="AI Bot"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
+                    <div className="flex justify-center items-center gap-4">
+                      <div className="flex items-center mb-2">
+                        <Image
+                          src="/images/man.png"
+                          alt="AI Bot"
+                          width={35}
+                          height={35}
+                          className="rounded-full"
+                        />
+                      </div>
+                      {msg.model && (
+                        <span className="text-base text-gray-700 font-bold mb-1">
+                          {msg.model}
+                        </span>
+                      )}
                     </div>
-                    {msg.model && (
-                      <span className="text-sm text-gray-500 font-medium mb-1">
-                        {msg.model}
-                      </span>
-                    )}
-                    <div className="p-3 bg-gray-200 rounded-lg text-black font-semibold max-w-[80%]">
+                    <div className="text-black mt-3 font-semibold">
                       {msg.text}
                     </div>
                   </div>
@@ -319,8 +321,8 @@ export default function Chatpage() {
           </div>
 
           {/* Message Input */}
-          <div className="w-full mt-auto">
-            <div className="relative">
+          <div className="fixed py-4 w-full bottom-0 bg-white flex justify-center items-center">
+            <div className="relative md:w-[666px] w-[90vw]">
               <Input
                 className="w-full px-12 py-6 bg-background"
                 placeholder="Send a message..."
