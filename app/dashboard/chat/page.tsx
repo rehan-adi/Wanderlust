@@ -1,12 +1,13 @@
 "use client";
 
+import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   CodeXml,
@@ -24,11 +25,13 @@ import {
   PlusCircle,
   QrCode,
   BrainCircuit,
+  Loader,
+  Loader2,
 } from "lucide-react";
 
 interface ChatMessage {
   id: number;
-  model: string;
+  model?: string;
   text: string;
   isUser: boolean;
 }
@@ -162,10 +165,21 @@ function RightSidebar() {
 
 export default function Chatpage() {
   const [message, setMessage] = useState("");
-  const [isLeftOpen, setIsLeftOpen] = useState(false);
-  const [isRightOpen, setIsRightOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatStarted, setChatStarted] = useState(false);
+
+  const [isLeftOpen, setIsLeftOpen] = useState(false);
+  const [isRightOpen, setIsRightOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
+  }, [chatMessages]);
 
   const features = [
     { title: "Code Generation", icon: <CodeXml className="w-5 h-5" /> },
@@ -174,30 +188,48 @@ export default function Chatpage() {
     { title: "Question & Answer", icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      const newMessage: ChatMessage = {
-        id: Date.now(),
-        text: message,
-        model: "Flask",
-        isUser: true,
-      };
-      setChatMessages((prevMessages) => [...prevMessages, newMessage]);
-      setMessage("");
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
 
-      if (!chatStarted) {
-        setChatStarted(true);
-      }
+    const userMessage: ChatMessage = {
+      id: Date.now(),
+      text: message,
+      isUser: true,
+    };
 
-      setTimeout(() => {
+    setChatMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMessage("");
+    setLoading(true);
+
+    if (!chatStarted) {
+      setChatStarted(true);
+    }
+
+    try {
+      const response = await axios.post("/api/chat", {
+        prompt: userMessage.text,
+      });
+
+      if (response.status == 200) {
         const aiResponse: ChatMessage = {
           id: Date.now() + 1,
-          model: "Flash",
-          text: "This is a simulated AI response from flux Ai, that can build any project you want in a one prompt and a one click ",
+          model: "AI Bot",
+          text: response.data.response || "No response received.",
           isUser: false,
         };
+
         setChatMessages((prevMessages) => [...prevMessages, aiResponse]);
-      }, 1000);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      const errorMessage: ChatMessage = {
+        id: Date.now() + 2,
+        text: "Sorry, there was an error processing your request. Please try again later.",
+        isUser: false,
+      };
+      setChatMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -275,19 +307,19 @@ export default function Chatpage() {
           {/* Chat Messages */}
           <div
             className={`w-full flex-grow overflow-y-auto mb-4 ${
-              chatStarted ? "mt-10 mb-20 md:mt-0" : ""
+              chatStarted ? "mt-10 mb-[45px] md:mt-0" : ""
             }`}
           >
             {chatMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex items-center mb-4 ${
+                className={`flex items-center mb-6 ${
                   msg.isUser ? "justify-end" : "justify-start"
                 }`}
               >
                 {/* AI Bot Avatar, Model Name, and Message */}
                 {!msg.isUser && (
-                  <div className="flex flex-col items-start">
+                  <div className="flex flex-col py-3 items-start">
                     <div className="flex justify-center items-center gap-4">
                       <div className="flex items-center mb-2">
                         <Image
@@ -312,12 +344,13 @@ export default function Chatpage() {
 
                 {/* User Message */}
                 {msg.isUser && (
-                  <div className="p-3 bg-blue-500 text-white rounded-lg font-semibold max-w-[80%] ml-auto">
+                  <div className="px-3 py-2 bg-blue-500 text-white rounded-lg font-semibold max-w-[80%] ml-auto">
                     {msg.text}
                   </div>
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
@@ -337,13 +370,21 @@ export default function Chatpage() {
                 }}
               />
               <button className="absolute bg-transparent left-4 top-1/2 -translate-y-1/2">
-                <Bot className="w-5 h-5 text-gray-500" />
+                <Bot className="w-5 h-5 text-gray-700" />
               </button>
               <button
                 className="absolute bg-transparent right-4 top-1/2 -translate-y-1/2"
                 onClick={handleSendMessage}
               >
-                <Send className="w-5 h-5 text-gray-500" />
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin text-gray-700 w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 text-gray-700" />
+                  </>
+                )}
               </button>
             </div>
           </div>
