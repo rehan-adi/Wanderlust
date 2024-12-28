@@ -6,14 +6,18 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download, Edit, Fullscreen, Info, Loader2 } from "lucide-react";
+import { Download, Edit, Fullscreen, Info, Loader2, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ImageGenerator() {
   const [prompt, setPrompt] = useState("");
   const [seed, setSeed] = useState("");
   const [loading, setLoading] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | undefined>(
+    undefined
+  );
 
   const handleGenerateImage = async () => {
     if (!prompt.trim()) return;
@@ -27,6 +31,8 @@ export default function ImageGenerator() {
 
       const imageUrl = response.data.imageUrl;
       setGeneratedImage(imageUrl);
+      setPrompt("");
+      setSeed("");
     } catch (error: any) {
       console.error("Error generating image:", error);
       const message =
@@ -51,6 +57,15 @@ export default function ImageGenerator() {
       .catch((error) => {
         console.error("Error downloading image:", error);
       });
+  };
+
+  const togglePreview = () => {
+    setIsPreviewing((prev) => !prev);
+    setIsModalOpen((prev) => !prev);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -142,7 +157,7 @@ export default function ImageGenerator() {
               <div className="rounded-lg flex items-center justify-center">
                 <img
                   src="/placeholder.svg"
-                  alt="Generated image"
+                  alt="default image"
                   className="rounded-lg object-cover w-full h-[auto] max-h-[50vh]"
                 />
               </div>
@@ -156,11 +171,15 @@ export default function ImageGenerator() {
                 <Download className="w-4 h-4 mr-1" />
                 Download
               </Button>
-              <Button variant="secondary" className="flex-1 text-sm py-2">
+              <Button
+                variant="outline"
+                onClick={togglePreview}
+                className="flex-1 text-sm py-2"
+              >
                 <Fullscreen className="w-4 h-4 mr-1" />
                 Preview
               </Button>
-              <Button variant="secondary" className="flex-1 text-sm py-2">
+              <Button variant="outline" className="flex-1 text-sm py-2">
                 <Edit className="w-4 h-4 mr-1" />
                 Edit Image
               </Button>
@@ -168,6 +187,23 @@ export default function ImageGenerator() {
           </CardContent>
         </Card>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 h-screen w-full z-50">
+          <div className="relative w-full h-full max-w-[90vw] max-h-[90vh] mx-auto md:mt-8 mt-48 my-auto">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-300 focus:outline-none"
+            >
+              <X size={24} />
+            </button>
+            <img
+              src={generatedImage}
+              alt="Preview"
+              className="rounded-lg max-w-full max-h-full object-contain mx-auto my-auto"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
