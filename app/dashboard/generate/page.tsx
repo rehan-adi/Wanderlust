@@ -1,50 +1,32 @@
 "use client";
 
 import axios from "axios";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { Send, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Wand2, Download, Edit } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Home() {
-  const [inputText, setInputText] = useState("");
-  const [loading, setLoading] = useState<boolean>(false);
+export default function ImageGenerator() {
+
+  const [prompt, setPrompt] = useState("");
+  const [seed, setSeed] = useState("");
+  const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [messages, setMessages] = useState<
-    { text: string; isUser: Boolean; loading?: boolean }[]
-  >([]);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const handleGenerateImage = async () => {
+    if (!prompt.trim()) return;
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
-
-    setMessages((prev) => [...prev, { text: inputText, isUser: true }]);
-    setInputText("");
-
-    setMessages((prev) => [
-      ...prev,
-      { text: "Generating image...", isUser: false, loading: true },
-    ]);
+    setLoading(true);
 
     try {
-      setLoading(true);
-      const response = await axios.post("/api/generate", { prompt: inputText });
+      const response = await axios.post("/api/generate", {
+        prompt,
+      });
 
       const imageUrl = response.data.imageUrl;
-
-      setMessages((prev) =>
-        prev.map((message, index) =>
-          index === prev.length - 1
-            ? { text: imageUrl, isUser: false }
-            : message
-        )
-      );
-
       setGeneratedImage(imageUrl);
     } catch (error: any) {
       console.error("Error generating image:", error);
@@ -53,29 +35,18 @@ export default function Home() {
       toast.error("Error generating image", {
         description: message,
       });
-
-      setMessages((prev) =>
-        prev.map((message, index) =>
-          index === prev.length - 1
-            ? {
-                text: "Failed to generate image. Please try again later.",
-                isUser: false,
-              }
-            : message
-        )
-      );
     } finally {
       setLoading(false);
     }
   };
 
-  const downloadImage = (url: string, name: string) => {
+  const downloadImage = (url: string) => {
     fetch(url)
       .then((response) => response.blob())
       .then((blob) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = name;
+        link.download = "generated-image.jpg";
         link.click();
       })
       .catch((error) => {
@@ -84,73 +55,97 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-white text-black min-h-screen flex justify-center items-center">
-      <div className="flex flex-col justify-end items-center w-full pt-3 pb-3">
-        <div className="flex flex-col space-y-7 my-4 mt-14 md:max-w-2xl w-full overflow-y-auto px-4 py-5">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.isUser ? "justify-end" : "justify-start"
-              }`}
-            >
-              {message.isUser ? (
-                <div className="bg-[#5865F2] text-white font-medium py-2 px-3 rounded-2xl max-w-[70%]">
-                  {message.text}
-                </div>
-              ) : message.loading ? (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-gray-200">
-                  <Loader2 size={20} className="animate-spin text-black" />
-                  <span className="font-medium">Generating image...</span>
-                </div>
-              ) : message.text.startsWith("http") ? (
-                // Display generated image
-                <div className="relative rounded-2xl group">
-                  <Image
-                    src={message.text}
-                    alt="Generated Image"
-                    width={430}
-                    height={430}
-                    className="max-w-full rounded-xl"
-                  />
-                  <button
-                    onClick={() => downloadImage(message.text, "image.jpg")}
-                    className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  >
-                    <Download size={20} />
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-red-500 text-white font-medium py-2 px-4 rounded-2xl max-w-[70%]">
-                  {message.text}
-                </div>
-              )}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+    <div className="w-full min-h-screen pt-24 px-4 py-8">
 
-        {/* Input and Send Button */}
-        <div className="flex gap-3 bg-white z-40 fixed bottom-0 py-5 justify-center w-full">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Describe your image"
-            className="py-3 px-7 bg-white rounded-2xl border border-black border-opacity-20 md:w-[40vw] w-[75vw] text-black font-medium placeholder:text-black placeholder:font-medium focus:outline-none"
-          />
-          <button
-            onClick={handleSend}
-            disabled={loading}
-            className={`flex items-center gap-2 py-3 px-5 rounded-2xl ${
-              loading
-                ? "bg-black text-white cursor-not-allowed"
-                : "bg-black text-white"
-            }`}
-          >
-            <Send size={18} />
-          </button>
-        </div>
+      <div className="text-center mb-12">
+        <h1 className="text-3xl font-bold mb-2">Create with Imagen for free</h1>
+        <p className="text-sm text-muted-foreground">
+          Transform Text into Stunning Images in Seconds with Imagen
+        </p>
+      </div>
+
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 w-full gap-6 md:px-36 px-4">
+      <Card className="sm:w-full md:w-auto">
+          <CardHeader>
+            <CardTitle>Imagen AI Image Generator</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Select a style, type to get your own flux ai image
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="prompt">Prompt</Label>
+              <Input
+                id="prompt"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe your Flux.1 AI Image, Default: a person"
+                className="resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="seed">Seed (Optional)</Label>
+              <Input
+                id="seed"
+                value={seed}
+                onChange={(e) => setSeed(e.target.value)}
+                placeholder="Random Seed, useful for generating the same style image"
+              />
+            </div>
+
+            <Button
+              onClick={handleGenerateImage}
+              disabled={loading}
+              className="w-full"
+              size="lg"
+            >
+              {loading ? "Generating..." : "Generate"}
+            </Button>
+          </CardContent>
+        </Card>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Imagen AI Image Generator Result</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+          {generatedImage ? (
+              <div className="rounded-lg flex items-center justify-center">
+                <img
+                  src={generatedImage}
+                  alt="Generated image"
+                  className="rounded-lg object-cover w-full md:w-[80%] lg:w-[50%] h-[auto] max-h-[50vh]"
+                />
+              </div>
+            ) : (
+              <div className="rounded-lg flex items-center justify-center">
+                <img
+                  src="/placeholder.svg"
+                  alt="Generated image"
+                  className="rounded-lg object-cover md:w-[80%] lg:w-[80%] h-[auto] max-h-[50vh]"
+                />
+              </div>
+            )}
+            <div className="flex mt-3 gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 text-sm py-2"
+                onClick={() => generatedImage && downloadImage(generatedImage)}
+              >
+                <Download className="w-4 h-4 mr-1" />
+                Download
+              </Button>
+              <Button variant="secondary" className="flex-1 text-sm py-2">
+                <Wand2 className="w-4 h-4 mr-1" />
+                Enhance HD
+              </Button>
+              <Button variant="secondary" className="flex-1 text-sm py-2">
+                <Edit className="w-4 h-4 mr-1" />
+                Edit Image
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
