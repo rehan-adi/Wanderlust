@@ -6,11 +6,10 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Wand2, Download, Edit } from "lucide-react";
+import { Download, Edit, Fullscreen, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ImageGenerator() {
-
   const [prompt, setPrompt] = useState("");
   const [seed, setSeed] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,31 +55,35 @@ export default function ImageGenerator() {
 
   return (
     <div className="w-full min-h-screen pt-24 px-4 py-8">
-
       <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold mb-2">Create with Imagen for free</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="md:text-4xl text-2xl font-bold mb-2">
+          Create with Imagen
+        </h1>
+        <p className="text-base font-semibold text-muted-foreground">
           Transform Text into Stunning Images in Seconds with Imagen
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 w-full gap-6 md:px-36 px-4">
-      <Card className="sm:w-full md:w-auto">
-          <CardHeader>
-            <CardTitle>Imagen AI Image Generator</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Select a style, type to get your own flux ai image
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 w-full gap-6 md:px-36 px-0">
+        <Card className="sm:w-full md:w-auto">
+          <CardHeader className="space-y-4">
+            <CardTitle className="text-xl">Imagen AI Image Generator</CardTitle>
+            <p className="text-base text-muted-foreground">
+              Create unique images by providing a descriptive prompt and
+              optional seed. The prompt defines the image's theme, while the
+              seed ensures consistent styles across generations. Please refrain
+              from generating explicit or inappropriate content.
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="prompt">Prompt</Label>
               <Input
                 id="prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe your Flux.1 AI Image, Default: a person"
-                className="resize-none"
+                placeholder="Enter a description for your AI image (e.g., 'futuristic city at sunset')."
+                className="resize-none py-5"
               />
             </div>
 
@@ -90,14 +93,23 @@ export default function ImageGenerator() {
                 id="seed"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
+                className="py-5"
                 placeholder="Random Seed, useful for generating the same style image"
               />
+            </div>
+
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <Info size={17} className="mt-0.5"/>
+              <p>
+                info: Image generation may take a few seconds. Thank you
+                for your patience!
+              </p>
             </div>
 
             <Button
               onClick={handleGenerateImage}
               disabled={loading}
-              className="w-full"
+              className="w-full py-5"
               size="lg"
             >
               {loading ? "Generating..." : "Generate"}
@@ -106,15 +118,17 @@ export default function ImageGenerator() {
         </Card>
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Imagen AI Image Generator Result</CardTitle>
+            <CardTitle className="text-xl">
+              Imagen AI Image Generator Result
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-          {generatedImage ? (
+            {generatedImage ? (
               <div className="rounded-lg flex items-center justify-center">
                 <img
                   src={generatedImage}
                   alt="Generated image"
-                  className="rounded-lg object-cover w-full md:w-[80%] lg:w-[50%] h-[auto] max-h-[50vh]"
+                  className="rounded-lg object-cover w-full h-[auto] max-h-[50vh]"
                 />
               </div>
             ) : (
@@ -122,11 +136,11 @@ export default function ImageGenerator() {
                 <img
                   src="/placeholder.svg"
                   alt="Generated image"
-                  className="rounded-lg object-cover md:w-[80%] lg:w-[80%] h-[auto] max-h-[50vh]"
+                  className="rounded-lg object-cover w-full h-[auto] max-h-[50vh]"
                 />
               </div>
             )}
-            <div className="flex mt-3 gap-2">
+            <div className="flex md:flex-row flex-col mt-3 gap-2">
               <Button
                 variant="outline"
                 className="flex-1 text-sm py-2"
@@ -136,8 +150,8 @@ export default function ImageGenerator() {
                 Download
               </Button>
               <Button variant="secondary" className="flex-1 text-sm py-2">
-                <Wand2 className="w-4 h-4 mr-1" />
-                Enhance HD
+                <Fullscreen className="w-4 h-4 mr-1" />
+                Preview
               </Button>
               <Button variant="secondary" className="flex-1 text-sm py-2">
                 <Edit className="w-4 h-4 mr-1" />
