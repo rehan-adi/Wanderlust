@@ -75,7 +75,7 @@ export default function ImageGenerator() {
           Create with Imagen
         </h1>
         <p className="text-base font-semibold text-muted-foreground">
-          Transform Text into Stunning Images in Seconds with Imagen
+        Transform Text into Stunning Images in a Few Minutes with Imagen.
         </p>
       </div>
 
@@ -189,17 +189,17 @@ export default function ImageGenerator() {
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 h-screen w-full z-50">
-          <div className="relative w-full h-full max-w-[90vw] max-h-[90vh] mx-auto md:mt-8 mt-48 my-auto">
+          <div className="relative w-full h-full max-w-[90vw] max-h-[100vh] mx-auto my-auto md:py-16 py-40">
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-300 focus:outline-none"
+              className="absolute top-3 right-0 bg-white p-2 rounded-full shadow-md hover:bg-gray-300 focus:outline-none"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
             <img
               src={generatedImage}
               alt="Preview"
-              className="rounded-lg max-w-full max-h-full object-contain mx-auto my-auto"
+              className="rounded-xl max-w-full max-h-full object-contain mx-auto my-auto"
             />
           </div>
         </div>
