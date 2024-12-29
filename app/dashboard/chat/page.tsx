@@ -3,11 +3,15 @@
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
+import "tailwindcss/tailwind.css";
+import ReactMarkdown from "react-markdown";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   CodeXml,
@@ -20,19 +24,19 @@ import {
   UserCheck,
   FileText,
   Zap,
-  Image as ImageIcon,
+  ImageIcon,
   Sparkles,
   PlusCircle,
   QrCode,
   BrainCircuit,
-  Loader,
   Loader2,
 } from "lucide-react";
 
 interface ChatMessage {
   id: number;
   model?: string;
-  text: string;
+  text?: string;
+  content: string | { type: string; value: string }[];
   isUser: boolean;
 }
 
@@ -173,6 +177,8 @@ export default function Chatpage() {
   const [isRightOpen, setIsRightOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  const { data: session } = useSession();
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -188,14 +194,51 @@ export default function Chatpage() {
     { title: "Question & Answer", icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
+  const parseAIResponse = (response: string) => {
+    try {
+      const parsedResponse = JSON.parse(response);
+      const parts = [];
+
+      if (parsedResponse.response) {
+        parts.push({ type: "text", value: parsedResponse.response });
+      }
+
+      if (parsedResponse.code) {
+        parts.push({ type: "code", value: parsedResponse.code });
+      }
+
+      if (parsedResponse.description) {
+        parts.push({ type: "text", value: parsedResponse.description });
+      }
+
+      if (parsedResponse.explanation) {
+        parts.push({ type: "text", value: parsedResponse.explanation });
+      }
+
+      if (parsedResponse.further_learning) {
+        const links = parsedResponse.further_learning
+          .map((link: string) => `- [${link}](${link})`)
+          .join("\n");
+        parts.push({ type: "text", value: `\n\nFurther Learning:\n${links}` });
+      }
+
+      return parts.length > 0 ? parts : [{ type: "text", value: response }];
+    } catch (error) {
+      console.error("Error parsing AI response:", error);
+      return [{ type: "text", value: response }];
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim()) return;
 
     const userMessage: ChatMessage = {
       id: Date.now(),
       text: message,
+      content: message,
       isUser: true,
     };
+    console.log("message from fuck", userMessage);
 
     setChatMessages((prevMessages) => [...prevMessages, userMessage]);
     setMessage("");
@@ -210,11 +253,15 @@ export default function Chatpage() {
         prompt: userMessage.text,
       });
 
+      console.log(response.data);
+
       if (response.status == 200) {
         const aiResponse: ChatMessage = {
           id: Date.now() + 1,
           model: "AI Bot",
-          text: response.data.response || "No response received.",
+          content: parseAIResponse(
+            response.data.response || "No response received."
+          ),
           isUser: false,
         };
 
@@ -225,6 +272,8 @@ export default function Chatpage() {
       const errorMessage: ChatMessage = {
         id: Date.now() + 2,
         text: "Sorry, there was an error processing your request. Please try again later.",
+        content:
+          "Sorry, there was an error processing your request. Please try again later.",
         isUser: false,
       };
       setChatMessages((prevMessages) => [...prevMessages, errorMessage]);
@@ -314,12 +363,12 @@ export default function Chatpage() {
               <div
                 key={msg.id}
                 className={`flex items-center mb-6 ${
-                  msg.isUser ? "justify-end" : "justify-start"
+                  msg.isUser ? "justify-start" : "justify-start"
                 }`}
               >
                 {/* AI Bot Avatar, Model Name, and Message */}
                 {!msg.isUser && (
-                  <div className="flex flex-col py-3 items-start">
+                  <div className="flex flex-col py-3 items-start max-w-[95%]">
                     <div className="flex justify-center items-center gap-4">
                       <div className="flex items-center mb-2">
                         <Image
@@ -336,16 +385,65 @@ export default function Chatpage() {
                         </span>
                       )}
                     </div>
-                    <div className="text-black mt-3 font-semibold">
-                      {msg.text}
+                    <div className="text-black mt-3">
+                      {Array.isArray(msg.content) ? (
+                        msg.content.map((item, index) => (
+                          <div key={index} className="mb-4 font-semibold ml-7">
+                            {item.type === "text" && (
+                              <ReactMarkdown className="prose max-w-none">
+                                {item.value}
+                              </ReactMarkdown>
+                            )}
+                            {item.type === "code" && (
+                              <div className="overflow-hidden w-full">
+                                <SyntaxHighlighter
+                                  language="rust"
+                                  style={atomDark}
+                                  className="rounded-md w-full"
+                                >
+                                  {item.value}
+                                </SyntaxHighlighter>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <ReactMarkdown className="prose ml-7 max-w-none">
+                          {msg.content}
+                        </ReactMarkdown>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {/* User Message */}
                 {msg.isUser && (
-                  <div className="px-3 py-2 bg-blue-500 text-white rounded-lg font-semibold max-w-[80%] ml-auto">
-                    {msg.text}
+                  <div className="flex items-center justify-center">
+                    <div className="flex flex-col items-start gap-2">
+                      <div className="flex items-center justify-start gap-4 mb-2">
+                        {session?.user?.image && (
+                          <div className="flex justify-start">
+                            <Image
+                              src={session.user.image}
+                              alt="User Avatar"
+                              width={35}
+                              height={35}
+                              blurDataURL="data:..."
+                              placeholder="blur"
+                              className="rounded-full cursor-pointer"
+                            />
+                          </div>
+                        )}
+                        {session?.user?.name && (
+                          <div className="font-semibold text-black text-base">
+                            {session.user.name}
+                          </div>
+                        )}
+                      </div>
+                      <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-semibold max-w-[95%]">
+                        {msg.text}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
