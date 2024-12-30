@@ -7,8 +7,8 @@ import "tailwindcss/tailwind.css";
 import ReactMarkdown from "react-markdown";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -36,7 +36,7 @@ interface ChatMessage {
   id: number;
   model?: string;
   text?: string;
-  content: string | { type: string; value: string }[];
+  content: string;
   isUser: boolean;
 }
 
@@ -87,7 +87,7 @@ function RightSidebar() {
               height={40}
               blurDataURL="data:..."
               placeholder="blur"
-              className="rounded-full cursor-pointer"
+              className="rounded-full"
             />
           </div>
         ) : (
@@ -194,41 +194,6 @@ export default function Chatpage() {
     { title: "Question & Answer", icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
-  const parseAIResponse = (response: string) => {
-    try {
-      const parsedResponse = JSON.parse(response);
-      const parts = [];
-
-      if (parsedResponse.response) {
-        parts.push({ type: "text", value: parsedResponse.response });
-      }
-
-      if (parsedResponse.code) {
-        parts.push({ type: "code", value: parsedResponse.code });
-      }
-
-      if (parsedResponse.description) {
-        parts.push({ type: "text", value: parsedResponse.description });
-      }
-
-      if (parsedResponse.explanation) {
-        parts.push({ type: "text", value: parsedResponse.explanation });
-      }
-
-      if (parsedResponse.further_learning) {
-        const links = parsedResponse.further_learning
-          .map((link: string) => `- [${link}](${link})`)
-          .join("\n");
-        parts.push({ type: "text", value: `\n\nFurther Learning:\n${links}` });
-      }
-
-      return parts.length > 0 ? parts : [{ type: "text", value: response }];
-    } catch (error) {
-      console.error("Error parsing AI response:", error);
-      return [{ type: "text", value: response }];
-    }
-  };
-
   const handleSendMessage = async () => {
     if (!message.trim()) return;
 
@@ -238,7 +203,6 @@ export default function Chatpage() {
       content: message,
       isUser: true,
     };
-    console.log("message from fuck", userMessage);
 
     setChatMessages((prevMessages) => [...prevMessages, userMessage]);
     setMessage("");
@@ -253,15 +217,11 @@ export default function Chatpage() {
         prompt: userMessage.text,
       });
 
-      console.log(response.data);
-
       if (response.status == 200) {
         const aiResponse: ChatMessage = {
           id: Date.now() + 1,
-          model: "AI Bot",
-          content: parseAIResponse(
-            response.data.response || "No response received."
-          ),
+          model: "Flash",
+          content: response.data.response || "No response received.",
           isUser: false,
         };
 
@@ -356,7 +316,7 @@ export default function Chatpage() {
           {/* Chat Messages */}
           <div
             className={`w-full flex-grow overflow-y-auto mb-4 ${
-              chatStarted ? "mt-10 mb-[45px] md:mt-0" : ""
+              chatStarted ? "mt-10 mb-[60px] md:mt-0" : ""
             }`}
           >
             {chatMessages.map((msg) => (
@@ -370,48 +330,47 @@ export default function Chatpage() {
                 {!msg.isUser && (
                   <div className="flex flex-col py-3 items-start max-w-[95%]">
                     <div className="flex justify-center items-center gap-4">
-                      <div className="flex items-center mb-2">
-                        <Image
-                          src="/images/man.png"
-                          alt="AI Bot"
-                          width={35}
-                          height={35}
-                          className="rounded-full"
-                        />
+                      <div className="flex items-center border border-black border-opacity-25 rounded-full p-2 mb-2">
+                        <BrainCircuit size={21} />
                       </div>
                       {msg.model && (
-                        <span className="text-base text-gray-700 font-bold mb-1">
+                        <span className="text-base text-black font-bold mb-1">
                           {msg.model}
                         </span>
                       )}
                     </div>
-                    <div className="text-black mt-3">
-                      {Array.isArray(msg.content) ? (
-                        msg.content.map((item, index) => (
-                          <div key={index} className="mb-4 font-semibold ml-7">
-                            {item.type === "text" && (
-                              <ReactMarkdown className="prose max-w-none">
-                                {item.value}
-                              </ReactMarkdown>
-                            )}
-                            {item.type === "code" && (
-                              <div className="overflow-hidden w-full">
-                                <SyntaxHighlighter
-                                  language="rust"
-                                  style={atomDark}
-                                  className="rounded-md w-full"
-                                >
-                                  {item.value}
-                                </SyntaxHighlighter>
-                              </div>
-                            )}
-                          </div>
-                        ))
-                      ) : (
-                        <ReactMarkdown className="prose ml-7 max-w-none">
-                          {msg.content}
-                        </ReactMarkdown>
-                      )}
+                    <div className="text-black font-medium mt-3 ml-7">
+                      <ReactMarkdown
+                        className="prose max-w-none leading-relaxed space-y-4"
+                        components={{
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }: any) {
+                            const match = /language-(\w+)/.exec(
+                              className || ""
+                            );
+                            return !inline && match ? (
+                              <SyntaxHighlighter
+                                language={match[1]}
+                                PreTag="div"
+                                style={atomDark}
+                              >
+                                {String(children).replace(/\n$/, "")}
+                              </SyntaxHighlighter>
+                            ) : (
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}
@@ -430,18 +389,18 @@ export default function Chatpage() {
                               height={35}
                               blurDataURL="data:..."
                               placeholder="blur"
-                              className="rounded-full cursor-pointer"
+                              className="rounded-full"
                             />
                           </div>
                         )}
                         {session?.user?.name && (
-                          <div className="font-semibold text-black text-base">
+                          <div className="font-bold text-black text-base">
                             {session.user.name}
                           </div>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-semibold max-w-[95%]">
-                        {msg.text}
+                      <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-medium max-w-[95%]">
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
                       </div>
                     </div>
                   </div>
@@ -454,36 +413,32 @@ export default function Chatpage() {
           {/* Message Input */}
           <div className="fixed py-4 w-full bottom-0 bg-white flex justify-center items-center">
             <div className="relative md:w-[666px] w-[90vw]">
-              <Input
-                className="w-full px-12 py-6 bg-background"
-                placeholder="Send a message..."
-                value={message}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setMessage(e.target.value)
-                }
-                onKeyPress={(e: React.KeyboardEvent) => {
-                  if (e.key === "Enter") {
-                    handleSendMessage();
-                  }
-                }}
-              />
-              <button className="absolute bg-transparent left-4 top-1/2 -translate-y-1/2">
-                <Bot className="w-5 h-5 text-gray-700" />
-              </button>
-              <button
-                className="absolute bg-transparent right-4 top-1/2 -translate-y-1/2"
-                onClick={handleSendMessage}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="animate-spin text-gray-700 w-4 h-4" />
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 text-gray-700" />
-                  </>
-                )}
-              </button>
+              <div className="relative w-full max-w-2xl">
+                <Textarea
+                  className="min-h-[40px] pr-20 text-black font-medium pl-12 py-2 resize-none"
+                  placeholder="Send a message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <Bot className="absolute left-4 top-3 h-5 w-5" />
+                <button
+                  className="absolute right-4 top-2.5 bg-transparent p-1 rounded-sm transition-colors hover:bg-muted"
+                  onClick={handleSendMessage}
+                  disabled={loading || !message.trim()}
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin h-5 w-5" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
