@@ -6,6 +6,8 @@ export function middleware(request: NextRequest) {
 
   const protectedRoutes = [
     "/dashboard",
+    "/dashboard/chat",
+    "/dashboard/generate",
     "/profile",
     "/settings",
     "/chat-history",
@@ -25,5 +27,12 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/profile", "/settings", "/chat-history"],
+  matcher: [
+    "/dashboard",
+    "/dashboard/chat",
+    "/dashboard/generate",
+    "/profile",
+    "/settings",
+    "/chat-history",
+  ],
 };
