@@ -1,48 +1,61 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, Content } from "@google/generative-ai";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY as string;
+const apiKey = process.env.GEMINI_API_KEY as string;
 
-const instruction = `
-You are a highly intelligent and empathetic assistant with expertise in software development, programming, and mentoring. 
-You possess a deep understanding of modern technologies, best practices, and industry standards across multiple programming languages and frameworks.
+const genAI = new GoogleGenerativeAI(apiKey);
 
-You excel at:  
-1. **Code Generation**: Writing high-quality, modular, and maintainable code. You always include clear and concise comments, follow industry best practices, and handle edge cases, errors, and exceptions gracefully. You structure projects to ensure scalability and readability.  
-2. **Answering Questions**: Providing detailed and accurate answers to technical and non-technical queries. You ensure explanations are simple enough for beginners to understand, while providing advanced insights for experienced users.  
-3. **Mentorship**: Guiding users by explaining concepts, recommending best practices, and encouraging learning. You adapt your communication style to the user's level of expertise, ensuring they feel supported and confident.
-
-When responding:  
-- Be thorough and clear in your explanations.  
-- Suggest actionable steps and provide examples whenever possible.  
-- Offer guidance that promotes growth and understanding for users at any skill level.
-
-You are not limited to programming alone and can assist with general problem-solving, career advice, debugging, design patterns, architectural guidance, or any topic where your knowledge can help the user succeed.
-`;
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  generationConfig: { responseMimeType: "application/json", temperature: 0.5 },
-  systemInstruction: instruction,
+  model: "gemini-1.5-pro",
 });
 
-export const generateResponse = async (prompt: string) => {
-  try {
-    const response = await model.generateContent(prompt);
-    const text =
-      response.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response content available.";
-    return text;
-  } catch (error: any) {
-    if (error.response) {
-      console.error(
-        "API Response Error:",
-        error.response.status,
-        error.response.data
-      );
-    } else {
-      console.error("Request Error:", error.message);
-    }
-    throw new Error("Failed to generate response");
-  }
+const generationConfig = {
+  temperature: 0.5,
+  topP: 0.9,
+  topK: 50,
+  maxOutputTokens: 2048,
+  responseMimeType: "text/plain",
 };
+
+type ChatEntry = Content;
+
+let chatHistory: ChatEntry[] = [];
+
+/**
+ * Sends a prompt to the Gemini model and returns the response.
+ * Updates history dynamically for contextual conversations.
+ * @param {string} prompt - The input prompt to send to the model.
+ * @returns {Promise<string>} - The response text from the model.
+ */
+export async function sendPrompt(prompt: string): Promise<string> {
+  if (!prompt || prompt.trim() === "") {
+    throw new Error("Prompt cannot be empty or whitespace.");
+  }
+
+  // Add the user input to the chat history
+  chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+  const chatSession = model.startChat({
+    generationConfig,
+    history: chatHistory,
+  });
+
+  try {
+    const result = await chatSession.sendMessage(prompt);
+    const responseText = result.response.text();
+
+    // Add model's response to history
+    chatHistory.push({
+      role: "model",
+      parts: [{ text: responseText }],
+    });
+
+    return responseText;
+  } catch (error) {
+    console.error("Error interacting with the model:", error);
+    throw new Error("Failed to process the prompt. Please try again later.");
+  }
+}
+
+export function clearChatHistory(): void {
+  chatHistory = [];
+}
