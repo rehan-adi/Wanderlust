@@ -1,4 +1,4 @@
-import { generateResponse } from "@/utils/aiResponse";
+import { sendPrompt } from "@/utils/aiResponse";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await generateResponse(prompt);
+    const response = await sendPrompt(prompt);
 
     return NextResponse.json({ success: true, response }, { status: 200 });
   } catch (error) {
