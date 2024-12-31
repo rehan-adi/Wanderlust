@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  email       String        @unique
-  name        String?
-  image       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  chatSession ChatSession[]
-  images      Images[]
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  name                String?
+  image               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  chatSession         ChatSession[]
+  images              Images[]
+  imagesPromptHistory ImagePromptHistory[]
 }
 
 model ChatSession {
@@ -30,7 +31,7 @@ model ChatSession {
 model ChatHistory {
   id            String      @id @default(uuid())
   prompt        String
-  imageUrl      String
+  message       String
   chatSessionId String
   chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
   createdAt     DateTime    @default(now())
@@ -38,6 +39,16 @@ model ChatHistory {
 }
 
 model Images {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  imageUrl  String
+  prompt    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ImagePromptHistory {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])

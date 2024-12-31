@@ -24,12 +24,36 @@ CREATE TABLE "ChatSession" (
 CREATE TABLE "ChatHistory" (
     "id" TEXT NOT NULL,
     "prompt" TEXT NOT NULL,
-    "imageUrl" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
     "chatSessionId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ChatHistory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Images" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "prompt" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Images_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ImagePromptHistory" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "prompt" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ImagePromptHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -40,3 +64,9 @@ ALTER TABLE "ChatSession" ADD CONSTRAINT "ChatSession_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "ChatHistory" ADD CONSTRAINT "ChatHistory_chatSessionId_fkey" FOREIGN KEY ("chatSessionId") REFERENCES "ChatSession"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Images" ADD CONSTRAINT "Images_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ImagePromptHistory" ADD CONSTRAINT "ImagePromptHistory_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
