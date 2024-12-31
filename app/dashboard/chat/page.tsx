@@ -30,6 +30,8 @@ import {
   QrCode,
   BrainCircuit,
   Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -173,6 +175,7 @@ export default function Chatpage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatStarted, setChatStarted] = useState(false);
 
+  const [copied, setCopied] = useState(false);
   const [isLeftOpen, setIsLeftOpen] = useState(false);
   const [isRightOpen, setIsRightOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -245,6 +248,13 @@ export default function Chatpage() {
   const handleNewChat = () => {
     setChatMessages([]);
     setChatStarted(false);
+  };
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   return (
@@ -341,7 +351,7 @@ export default function Chatpage() {
                     </div>
                     <div className="text-black font-medium mt-3 ml-7">
                       <ReactMarkdown
-                        className="prose max-w-none leading-relaxed space-y-4"
+                        className="prose max-w-xl leading-relaxed space-y-4"
                         components={{
                           code({
                             node,
@@ -353,14 +363,42 @@ export default function Chatpage() {
                             const match = /language-(\w+)/.exec(
                               className || ""
                             );
+                            const codeContent = String(children).replace(
+                              /\n$/,
+                              ""
+                            );
                             return !inline && match ? (
-                              <SyntaxHighlighter
-                                language={match[1]}
-                                PreTag="div"
-                                style={atomDark}
-                              >
-                                {String(children).replace(/\n$/, "")}
-                              </SyntaxHighlighter>
+                              <div className="relative group">
+                                <button
+                                  className="absolute right-1 top-1 bg-gray-100 text-black text-sm font-medium px-2 py-1 rounded border"
+                                  onClick={() => handleCopy(codeContent)}
+                                >
+                                  {copied ? (
+                                    <>
+                                      <Check
+                                        size={16}
+                                        className="inline-block text-black mr-0.5"
+                                      />{" "}
+                                      Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy
+                                        size={14}
+                                        className="inline-block mr-0.5"
+                                      />{" "}
+                                      Copy code
+                                    </>
+                                  )}
+                                </button>
+                                <SyntaxHighlighter
+                                  language={match[1]}
+                                  PreTag="div"
+                                  style={atomDark}
+                                >
+                                  {codeContent}
+                                </SyntaxHighlighter>
+                              </div>
                             ) : (
                               <code className={className} {...props}>
                                 {children}
@@ -399,7 +437,7 @@ export default function Chatpage() {
                           </div>
                         )}
                       </div>
-                      <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-medium max-w-[95%]">
+                      <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-medium max-w-xl">
                         <ReactMarkdown>{msg.text}</ReactMarkdown>
                       </div>
                     </div>
