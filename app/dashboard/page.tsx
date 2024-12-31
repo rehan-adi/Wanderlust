@@ -27,7 +27,7 @@ const Dashboard = () => {
         <div className="flex justify-center w-full">
           <Button
             asChild
-            className="bg-[#0f172a] text-lg font-semibold py-5 text-white w-full hover:bg-[#1e293b]"
+            className="bg-black text-lg font-semibold py-5 text-white w-full"
           >
             <Link href="/dashboard/chat">
               Flash <ExternalLink size={30} className="inline-block ml-2" />{" "}
@@ -55,7 +55,7 @@ const Dashboard = () => {
         <div className="flex justify-center w-full">
           <Button
             asChild
-            className="bg-[#0f172a] text-lg font-semibold py-5 text-white w-full hover:bg-[#1e293b]"
+            className="bg-black text-lg font-semibold py-5 text-white w-full"
           >
             <Link href="/dashboard/generate">
               Imagen <ExternalLink size={30} className="inline-block ml-2" />{" "}

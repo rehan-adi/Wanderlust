@@ -46,7 +46,7 @@ export default function PricingPage() {
           <CardFooter>
             <Link href="/dashboard" className="w-full">
               <Button
-                className="bg-[#0f172a] w-full text-white text-base font-semibold hover:bg-[#1e293b"
+                className="bg-black w-full text-white text-base font-semibold"
                 variant="default"
                 size="lg"
               >
@@ -85,7 +85,7 @@ export default function PricingPage() {
           </CardContent>
           <CardFooter>
             <Button
-              className="bg-[#0f172a] w-full text-white text-base font-semibold hover:bg-[#1e293b"
+              className="bg-black w-full text-white text-base font-semibold"
               variant="default"
               size="lg"
             >

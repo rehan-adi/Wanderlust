@@ -29,13 +29,13 @@ export default function Home() {
           <div className="flex flex-wrap gap-4">
             <Button
               asChild
-              className="bg-[#0f172a] text-white hover:bg-[#1e293b]"
+              className="bg-black text-white py-5"
             >
               <Link href="/dashboard">
                 Browse services <MoveRight className="inline-block" />
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="py-5">
               <Link href="/gallery">
                 Explore Gallery <MoveRight className="inline-block" />
               </Link>

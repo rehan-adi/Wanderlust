@@ -72,7 +72,7 @@ export default function Navbar() {
               </div>
             ) : session?.user?.id ? (
               <>
-                <Button className="bg-[#0f172a] text-white hover:bg-[#1e293b]">
+                <Button className="bg-black text-white py-5">
                   <Link href="/dashboard">
                     Go to Dashboard{" "}
                     <ArrowUpRight className="inline-block ml-1" />
@@ -116,7 +116,10 @@ export default function Navbar() {
                         </li>
                         <li className="px-4 py-2 rounded-xl hover:bg-gray-100 font-medium flex cursor-pointer">
                           <Link href="/pricing">
-                            <CreditCard size={17} className="inline-block mr-2" />
+                            <CreditCard
+                              size={17}
+                              className="inline-block mr-2"
+                            />
                             Pricing
                           </Link>
                         </li>
@@ -145,10 +148,7 @@ export default function Navbar() {
                 )}
               </>
             ) : (
-              <Button
-                onClick={openSignin}
-                className="bg-[#0f172a] text-white hover:bg-[#1e293b]"
-              >
+              <Button onClick={openSignin} className="bg-black text-white py-5">
                 Sign In
               </Button>
             )}
@@ -224,14 +224,14 @@ export default function Navbar() {
               {session?.user?.id ? (
                 <Button
                   onClick={() => signOut()}
-                  className="bg-[#0f172a] text-white hover:bg-[#1e293b] font-medium text-base py-2 px-4 rounded-lg"
+                  className="bg-black text-white font-medium text-base py-2 px-4 rounded-lg"
                 >
                   Sign Out
                 </Button>
               ) : (
                 <Button
                   onClick={openSignin}
-                  className="bg-[#0f172a] text-white hover:bg-[#1e293b] font-medium text-base py-2 px-4 rounded-lg"
+                  className="bg-black text-white font-medium text-base py-2 px-4 rounded-lg"
                 >
                   Sign In
                 </Button>
