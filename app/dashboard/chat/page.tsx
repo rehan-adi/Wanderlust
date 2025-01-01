@@ -36,6 +36,7 @@ import {
 
 interface ChatMessage {
   id: number;
+  sessionId?: string;
   model?: string;
   text?: string;
   content: string;
@@ -75,7 +76,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
 }
 
 function RightSidebar() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   return (
     <div className="w-64 h-screen bg-background border-l z-50 flex flex-col fixed right-0 top-0">
@@ -171,6 +172,7 @@ function RightSidebar() {
 
 export default function Chatpage() {
   const [message, setMessage] = useState("");
+  const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatStarted, setChatStarted] = useState(false);
@@ -197,6 +199,21 @@ export default function Chatpage() {
     { title: "Question & Answer", icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
+  useEffect(() => {
+    const fetchSessionId = async () => {
+      try {
+        const response = await axios.post("/api/chat/create-session");
+        setSessionId(response.data.sessionId);
+      } catch (error) {
+        console.error("Failed to create session:", error);
+      }
+    };
+
+    if (!sessionId) {
+      fetchSessionId();
+    }
+  }, [sessionId]);
+
   const handleSendMessage = async () => {
     if (!message.trim()) return;
 
@@ -216,19 +233,20 @@ export default function Chatpage() {
     }
 
     try {
-      const response = await axios.post("/api/chat", {
+      const response = await axios.post("/api/chat/send-message", {
         prompt: userMessage.text,
+        chatSessionId: sessionId,
       });
 
-      if (response.status == 200) {
-        const aiResponse: ChatMessage = {
+      if (response.status == 201) {
+        const Response: ChatMessage = {
           id: Date.now() + 1,
           model: "Flash",
-          content: response.data.response || "No response received.",
+          content: response.data.aiResponse || "No response received.",
           isUser: false,
         };
 
-        setChatMessages((prevMessages) => [...prevMessages, aiResponse]);
+        setChatMessages((prevMessages) => [...prevMessages, Response]);
       }
     } catch (error) {
       console.error("Failed to send message:", error);
