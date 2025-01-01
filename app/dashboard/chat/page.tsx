@@ -48,6 +48,22 @@ interface SidebarProps {
 }
 
 function LeftSidebar({ onNewChat }: SidebarProps) {
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    getChatHistory();
+  }, []);
+
+  const getChatHistory = async () => {
+    try {
+      const response = await axios.get("/api/chat/get-sessions");
+      console.log("Chat history:", response.data.sessions);
+      setChatHistory(response.data.sessions);
+    } catch (error) {
+      console.log("Failed to get chat history:", error);
+    }
+  };
+
   return (
     <>
       <div className="w-64 h-screen bg-background border-r z-50 flex flex-col fixed left-0 top-0">
@@ -70,6 +86,20 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
             New Chat
           </Button>
         </div>
+        <div className="px-4">
+          <div className="text-black font-semibold mb-3">Recent Chats</div>
+          <div className="space-y-2">
+            {chatHistory.map((chat: any) => (
+              <Button
+                key={chat.id}
+                variant="outline"
+                className="w-full py-5 justify-start"
+              >
+                {chat.chatHistory[0]?.prompt}
+              </Button>
+            ))}
+          </div>
+          </div>
       </div>
     </>
   );
