@@ -57,7 +57,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
   const getChatHistory = async () => {
     try {
       const response = await axios.get("/api/chat/get-sessions");
-      console.log("Chat history:", response.data.sessions);
+      console.log("Chat History:", response.data.sessions);
       setChatHistory(response.data.sessions);
     } catch (error) {
       console.log("Failed to get chat history:", error);
@@ -87,7 +87,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
           </Button>
         </div>
         <div className="px-4">
-          <div className="text-black font-semibold mb-3">Recent Chats</div>
+          <div className="text-black font-semibold mb-4 mt-6">Recent Chats</div>
           <div className="space-y-2">
             {chatHistory.map((chat: any) => (
               <Button
@@ -95,7 +95,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
                 variant="outline"
                 className="w-full py-5 justify-start"
               >
-                {chat.chatHistory[0]?.prompt}
+                 {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
               </Button>
             ))}
           </div>
@@ -232,17 +232,25 @@ export default function Chatpage() {
   useEffect(() => {
     const fetchSessionId = async () => {
       try {
-        const response = await axios.post("/api/chat/create-session");
-        setSessionId(response.data.sessionId);
+        let existingSessionId = localStorage.getItem("sessionId") as string;
+        
+        if (!existingSessionId) {
+          const response = await axios.get("/api/chat/check-session");
+          existingSessionId = response.data.sessionId;
+          localStorage.setItem("sessionId", existingSessionId);
+        }
+  
+        setSessionId(existingSessionId);
       } catch (error) {
-        console.error("Failed to create session:", error);
+        console.error("Failed to create or fetch session:", error);
       }
     };
-
+  
     if (!sessionId) {
       fetchSessionId();
     }
   }, [sessionId]);
+  
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
