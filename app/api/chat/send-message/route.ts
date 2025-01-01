@@ -5,25 +5,33 @@ import { sendPrompt } from "@/utils/aiResponse";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
+    if (!session) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    }
+
+    const { chatSessionId, prompt } = await req.json();
+
+    const aiResponse = await sendPrompt(prompt);
+
+    await prisma.chatHistory.create({
+      data: {
+        prompt,
+        message: aiResponse,
+        chatSessionId: chatSessionId.toString(),
+      },
     });
+
+    return NextResponse.json({ aiResponse }, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-
-  const { chatSessionId, prompt } = await req.json();
-
-  const aiResponse = await sendPrompt(prompt);
-
-  await prisma.chatHistory.create({
-    data: {
-      prompt,
-      message: aiResponse,
-      chatSessionId: chatSessionId.toString(),
-    },
-  });
-
-  return NextResponse.json({ aiResponse }, { status: 201 });
 }
