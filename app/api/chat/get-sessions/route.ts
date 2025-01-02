@@ -17,6 +17,7 @@ export async function GET(req: Request) {
   const sessions = await prisma.chatSession.findMany({
     where: { userId },
     select: {
+      id: true,
       chatHistory: {
         select: {
           prompt: true,
