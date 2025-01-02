@@ -48,19 +48,22 @@ interface SidebarProps {
 }
 
 function LeftSidebar({ onNewChat }: SidebarProps) {
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState<[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getChatHistory();
   }, []);
 
   const getChatHistory = async () => {
+    setLoading(true);
     try {
       const response = await axios.get("/api/chat/get-sessions");
-      console.log("Chat History:", response.data.sessions);
       setChatHistory(response.data.sessions);
     } catch (error) {
       console.log("Failed to get chat history:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,17 +92,25 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
         <div className="px-4">
           <div className="text-black font-semibold mb-4 mt-6">Recent Chats</div>
           <div className="space-y-2">
-            {chatHistory.map((chat: any) => (
-              <Button
-                key={chat.id}
-                variant="outline"
-                className="w-full py-5 justify-start"
-              >
-                 {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
-              </Button>
-            ))}
+            {loading ? (
+              <div className="flex justify-center items-center h-14">
+                <Loader2 className="animate-spin h-4 w-4" />
+              </div>
+            ) : (
+              <>
+                {chatHistory.map((chat: any) => (
+                  <Button
+                    key={chat.id}
+                    variant="outline"
+                    className="w-full py-5 justify-start"
+                  >
+                    {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                  </Button>
+                ))}
+              </>
+            )}
           </div>
-          </div>
+        </div>
       </div>
     </>
   );
@@ -233,24 +244,23 @@ export default function Chatpage() {
     const fetchSessionId = async () => {
       try {
         let existingSessionId = localStorage.getItem("sessionId") as string;
-        
+
         if (!existingSessionId) {
           const response = await axios.get("/api/chat/check-session");
           existingSessionId = response.data.sessionId;
           localStorage.setItem("sessionId", existingSessionId);
         }
-  
+
         setSessionId(existingSessionId);
       } catch (error) {
         console.error("Failed to create or fetch session:", error);
       }
     };
-  
+
     if (!sessionId) {
       fetchSessionId();
     }
   }, [sessionId]);
-  
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -301,9 +311,16 @@ export default function Chatpage() {
     }
   };
 
-  const handleNewChat = () => {
-    setChatMessages([]);
-    setChatStarted(false);
+  const handleNewChat = async () => {
+    try {
+      const response = await axios.post("/api/chat/create-session");
+      if (response.status == 201) {
+        setSessionId(response.data.sessionId);
+        localStorage.setItem("sessionId", response.data.sessionId);
+      }
+    } catch (error) {
+      console.log("Failed to create new chat:", error);
+    }
   };
 
   const handleCopy = (text: string) => {
