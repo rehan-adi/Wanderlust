@@ -453,13 +453,13 @@ export default function Chatpage() {
                             return !inline && match ? (
                               <div className="relative group">
                                 <button
-                                  className="absolute right-1 top-1 bg-gray-100 text-black text-sm font-medium px-2 py-1 rounded border"
+                                  className="absolute right-1 top-1 bg-gray-100 text-black text-xs font-medium px-2 py-1 rounded border"
                                   onClick={() => handleCopy(codeContent)}
                                 >
                                   {copied ? (
                                     <>
                                       <Check
-                                        size={16}
+                                        size={13}
                                         className="inline-block text-black mr-0.5"
                                       />{" "}
                                       Copied!
@@ -467,7 +467,7 @@ export default function Chatpage() {
                                   ) : (
                                     <>
                                       <Copy
-                                        size={14}
+                                        size={12}
                                         className="inline-block mr-0.5"
                                       />{" "}
                                       Copy code
