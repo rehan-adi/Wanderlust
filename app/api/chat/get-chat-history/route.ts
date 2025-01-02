@@ -13,8 +13,8 @@ export async function GET(req: Request) {
       });
     }
 
-    const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get("sessionId");
+    const url = new URL(req.url);
+    const sessionId = url.searchParams.get("sessionId");
 
     if (!sessionId) {
       return new Response(JSON.stringify({ error: "Session ID required" }), {
@@ -24,6 +24,7 @@ export async function GET(req: Request) {
 
     const chatHistory = await prisma.chatHistory.findMany({
       where: { chatSessionId: sessionId },
+      select: { prompt: true, message: true },
       orderBy: { createdAt: "asc" },
     });
 
