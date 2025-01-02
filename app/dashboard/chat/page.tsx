@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import Link from "next/link";
+import { toast } from "sonner";
 import Image from "next/image";
 import "tailwindcss/tailwind.css";
 import ReactMarkdown from "react-markdown";
@@ -32,6 +33,7 @@ import {
   Loader2,
   Copy,
   Check,
+  CodeSquare,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -43,11 +45,13 @@ interface ChatMessage {
   isUser: boolean;
 }
 
-interface SidebarProps {
+function LeftSidebar({
+  onNewChat,
+  setSessionId,
+}: {
   onNewChat: () => void;
-}
-
-function LeftSidebar({ onNewChat }: SidebarProps) {
+  setSessionId: (id: string) => void;
+}) {
   const [chatHistory, setChatHistory] = useState<[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -60,6 +64,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
     try {
       const response = await axios.get("/api/chat/get-sessions");
       setChatHistory(response.data.sessions);
+      console.log("Chat History:", response.data.sessions);
     } catch (error) {
       console.log("Failed to get chat history:", error);
     } finally {
@@ -103,6 +108,7 @@ function LeftSidebar({ onNewChat }: SidebarProps) {
                     key={chat.id}
                     variant="outline"
                     className="w-full py-5 justify-start"
+                    onClick={() => setSessionId(chat.id)}
                   >
                     {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
                   </Button>
@@ -215,8 +221,8 @@ export default function Chatpage() {
   const [message, setMessage] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatStarted, setChatStarted] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const [copied, setCopied] = useState(false);
   const [isLeftOpen, setIsLeftOpen] = useState(false);
@@ -312,11 +318,14 @@ export default function Chatpage() {
   };
 
   const handleNewChat = async () => {
+    setChatMessages([]);
+    setChatStarted(false);
     try {
       const response = await axios.post("/api/chat/create-session");
       if (response.status == 201) {
         setSessionId(response.data.sessionId);
         localStorage.setItem("sessionId", response.data.sessionId);
+        toast.success("New chat session created successfully!");
       }
     } catch (error) {
       console.log("Failed to create new chat:", error);
@@ -334,7 +343,7 @@ export default function Chatpage() {
     <div className="flex min-h-screen bg-background">
       {/* Left Sidebar */}
       <div className="hidden md:block">
-        <LeftSidebar onNewChat={handleNewChat} />
+        <LeftSidebar onNewChat={handleNewChat} setSessionId={setSessionId} />
       </div>
 
       {/* Main Content */}
@@ -347,7 +356,10 @@ export default function Chatpage() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="py-4">
-                <LeftSidebar onNewChat={handleNewChat} />
+                <LeftSidebar
+                  onNewChat={handleNewChat}
+                  setSessionId={setSessionId}
+                />
               </div>
             </SheetContent>
           </Sheet>
