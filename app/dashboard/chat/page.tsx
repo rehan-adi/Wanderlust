@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import "tailwindcss/tailwind.css";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -45,13 +46,9 @@ interface ChatMessage {
   isUser: boolean;
 }
 
-function LeftSidebar({
-  onNewChat,
-  setSessionId,
-}: {
-  onNewChat: () => void;
-  setSessionId: (id: string) => void;
-}) {
+function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
+  const router = useRouter();
+
   const [chatHistory, setChatHistory] = useState<[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -70,6 +67,10 @@ function LeftSidebar({
     } finally {
       setLoading(false);
     }
+  };
+
+  const getHistory = async (sessionId: string) => {
+    router.push(`/dashboard/chat/${sessionId}`);
   };
 
   return (
@@ -108,7 +109,7 @@ function LeftSidebar({
                     key={chat.id}
                     variant="outline"
                     className="w-full py-5 justify-start"
-                    onClick={() => setSessionId(chat.id)}
+                    onClick={() => getHistory(chat.id)}
                   >
                     {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
                   </Button>
@@ -343,7 +344,7 @@ export default function Chatpage() {
     <div className="flex min-h-screen bg-background">
       {/* Left Sidebar */}
       <div className="hidden md:block">
-        <LeftSidebar onNewChat={handleNewChat} setSessionId={setSessionId} />
+        <LeftSidebar onNewChat={handleNewChat} />
       </div>
 
       {/* Main Content */}
@@ -356,10 +357,7 @@ export default function Chatpage() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="py-4">
-                <LeftSidebar
-                  onNewChat={handleNewChat}
-                  setSessionId={setSessionId}
-                />
+                <LeftSidebar onNewChat={handleNewChat} />
               </div>
             </SheetContent>
           </Sheet>
