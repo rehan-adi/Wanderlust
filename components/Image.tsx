@@ -47,7 +47,7 @@ export function Images({ images }: ImageGridProps) {
         <Search />
       </div>
       <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-28 gap-1.5">
-        {images.length > 0 ? (
+        {Array.isArray(images) && images.length > 0 ? (
           images.map((img, index) => (
             <div
               key={index}

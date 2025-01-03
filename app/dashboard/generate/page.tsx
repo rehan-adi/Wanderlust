@@ -25,7 +25,7 @@ export default function ImageGenerator() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/generate", {
+      const response = await axios.post("/api/generate-image", {
         prompt,
       });
 
@@ -75,7 +75,7 @@ export default function ImageGenerator() {
           Create with Imagen
         </h1>
         <p className="text-base font-semibold text-muted-foreground">
-        Transform Text into Stunning Images in a Few Minutes with Imagen.
+          Transform Text into Stunning Images in a Few Minutes with Imagen.
         </p>
       </div>
 
