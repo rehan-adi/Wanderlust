@@ -47,7 +47,7 @@ interface ChatMessage {
   isUser: boolean;
 }
 
-function LeftSidebar() {
+function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
   const router = useRouter();
 
   const [chatHistory, setChatHistory] = useState<[]>([]);
@@ -89,7 +89,7 @@ function LeftSidebar() {
           <Button
             variant="outline"
             className="mb-4 w-full py-5 justify-start"
-            // onClick={onNewChat}
+            onClick={onNewChat}
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             New Chat
@@ -237,6 +237,7 @@ function RightSidebar() {
 function ChatHistory() {
   const { sessionId } = useParams();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
@@ -327,6 +328,7 @@ function ChatHistory() {
       if (response.status == 201) {
         setChatSessionId(response.data.sessionId);
         localStorage.setItem("sessionId", response.data.sessionId);
+        router.push("/dashboard/chat");
         toast.success("New chat session created successfully!");
       }
     } catch (error) {
@@ -345,7 +347,7 @@ function ChatHistory() {
     <div className="flex min-h-screen bg-background">
       {/* Left Sidebar */}
       <div className="hidden md:block">
-        <LeftSidebar />
+        <LeftSidebar onNewChat={handleNewChat} />
       </div>
 
       {/* Main Content */}
@@ -358,7 +360,7 @@ function ChatHistory() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="py-4">
-                <LeftSidebar />
+                <LeftSidebar onNewChat={handleNewChat} />
               </div>
             </SheetContent>
           </Sheet>
