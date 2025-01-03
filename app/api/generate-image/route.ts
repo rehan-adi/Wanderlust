@@ -35,29 +35,6 @@ export const POST = async (req: NextRequest) => {
     const body = await req.json();
     const prompt = promptValidation.parse(body);
 
-    const activeSession = await prisma.chatSession.findFirst({
-      where: {
-        userId: userId,
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-      include: {
-        chatHistory: true,
-      },
-    });
-
-    let sessionId = activeSession ? activeSession.id : null;
-
-    if (!sessionId) {
-      const newSession = await prisma.chatSession.create({
-        data: {
-          userId: userId,
-        },
-      });
-      sessionId = newSession.id;
-    }
-
     const response = await axios.post(
       HUGGINGFACE_IMAGE_MODEL_API_URL,
       { inputs: prompt.prompt },
@@ -95,11 +72,11 @@ export const POST = async (req: NextRequest) => {
       },
     ]);
 
-    await prisma.chatHistory.create({
+    await prisma.imagePromptHistory.create({
       data: {
-        prompt: prompt.prompt,
+        userId: userId,
         imageUrl,
-        chatSessionId: sessionId,
+        prompt: prompt.prompt,
       },
     });
 
