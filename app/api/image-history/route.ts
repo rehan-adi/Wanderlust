@@ -16,47 +16,23 @@ export const GET = async (req: NextRequest) => {
 
     const userId = session.user.id;
 
-    const sessions = await prisma.chatSession.findMany({
+    const imageHistory = await prisma.imagePromptHistory.findMany({
       where: {
         userId: userId,
       },
       select: {
         id: true,
+        prompt: true,
+        imageUrl: true,
         createdAt: true,
-        user: {
-          select: {
-            images: {
-              select: {
-                id: true,
-              },
-            },
-          },
-        },
-        chatHistory: {
-          orderBy: { createdAt: "desc" },
-          select: {
-            prompt: true,
-            createdAt: true,
-            imageUrl: true,
-          },
-        },
       },
     });
-
-    const sessionsWithImageCount = sessions.map((session) => ({
-      ...session,
-      imageCount: session.user.images.length,
-    }));
 
     return NextResponse.json(
       {
         success: true,
-        sessions: sessions,
-        imageCount: sessionsWithImageCount.reduce(
-          (acc, curr) => acc + curr.imageCount,
-          0
-        ),
-        message: "Successfully fetched chat history",
+        imageHistory: imageHistory,
+        message: "Successfully fetched image history",
       },
       { status: 200 }
     );
