@@ -111,7 +111,9 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
                     className="w-full py-5 justify-start"
                     onClick={() => getHistory(chat.id)}
                   >
-                    {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                    <div className="truncate max-w-full">
+                      {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                    </div>
                   </Button>
                 ))}
               </>

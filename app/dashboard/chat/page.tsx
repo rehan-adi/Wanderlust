@@ -61,7 +61,6 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
     try {
       const response = await axios.get("/api/chat/get-sessions");
       setChatHistory(response.data.sessions);
-      console.log("Chat History:", response.data.sessions);
     } catch (error) {
       console.log("Failed to get chat history:", error);
     } finally {
@@ -111,7 +110,9 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
                     className="w-full py-5 justify-start"
                     onClick={() => getHistory(chat.id)}
                   >
-                    {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                    <div className="truncate max-w-full">
+                      {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                    </div>
                   </Button>
                 ))}
               </>
@@ -152,8 +153,8 @@ function RightSidebar() {
             >
               <circle cx="18" cy="18" r="18" fill="#3c46ff"></circle>
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="m7.358 14.641 5.056-5.055A2 2 0 0 1 13.828 9h8.343a2 2 0 0 1 1.414.586l5.056 5.055a2 2 0 0 1 .055 2.771l-9.226 9.996a2 2 0 0 1-2.94 0l-9.227-9.996a2 2 0 0 1 .055-2.77Zm6.86-1.939-.426 1.281a2.07 2.07 0 0 1-1.31 1.31l-1.28.426a.296.296 0 0 0 0 .561l1.28.428a2.07 2.07 0 0 1 1.31 1.309l.427 1.28c.09.27.471.27.56 0l.428-1.28a2.07 2.07 0 0 1 1.309-1.31l1.281-.427a.296.296 0 0 0 0-.56l-1.281-.428a2.07 2.07 0 0 1-1.309-1.309l-.427-1.28a.296.296 0 0 0-.561 0z"
                 fill="#fff"
               ></path>
