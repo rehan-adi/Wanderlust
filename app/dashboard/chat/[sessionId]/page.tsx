@@ -152,8 +152,8 @@ function RightSidebar() {
             >
               <circle cx="18" cy="18" r="18" fill="#3c46ff"></circle>
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="m7.358 14.641 5.056-5.055A2 2 0 0 1 13.828 9h8.343a2 2 0 0 1 1.414.586l5.056 5.055a2 2 0 0 1 .055 2.771l-9.226 9.996a2 2 0 0 1-2.94 0l-9.227-9.996a2 2 0 0 1 .055-2.77Zm6.86-1.939-.426 1.281a2.07 2.07 0 0 1-1.31 1.31l-1.28.426a.296.296 0 0 0 0 .561l1.28.428a2.07 2.07 0 0 1 1.31 1.309l.427 1.28c.09.27.471.27.56 0l.428-1.28a2.07 2.07 0 0 1 1.309-1.31l1.281-.427a.296.296 0 0 0 0-.56l-1.281-.428a2.07 2.07 0 0 1-1.309-1.309l-.427-1.28a.296.296 0 0 0-.561 0z"
                 fill="#fff"
               ></path>
@@ -234,8 +234,9 @@ function RightSidebar() {
   );
 }
 
-function WanderlustAI() {
+function ChatHistory() {
   const { sessionId } = useParams();
+  const { data: session } = useSession();
 
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
@@ -374,29 +375,61 @@ function WanderlustAI() {
 
         <main className="flex-1 overflow-auto p-6">
           {chatLoading ? (
-            <div className="text-center">Loading chat history...</div>
+            <div className="max-w-2xl mx-auto py-4 mb-[80px] space-y-6">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="space-y-6 animate-pulse">
+                  {/* User's Prompt Skeleton */}
+                  <div className="flex items-start flex-col justify-center gap-2">
+                    <div className="flex items-center mb-2 gap-4">
+                      <div className="w-9 h-9 bg-gray-300 rounded-full"></div>
+                      <div className="w-16 h-5 bg-gray-300 rounded"></div>
+                    </div>
+                    <div className="bg-gray-200 p-3 ml-7 rounded-xl shadow-md w-3/4 h-12"></div>
+                  </div>
+
+                  {/* AI's Message Skeleton */}
+                  <div className="flex flex-col py-3 items-start">
+                    <div className="flex justify-center items-center gap-4">
+                      <div className="flex justify-center items-center gap-4">
+                        <div className="flex items-center border border-black border-opacity-25 rounded-full p-2 mb-2">
+                          <BrainCircuit size={21} />
+                        </div>
+                        <span className="text-base text-black font-bold mb-1">
+                          Flash
+                        </span>
+                      </div>
+                    </div>
+                    <div className="bg-gray-200 mt-3 ml-7 rounded-xl shadow-md w-3/4 h-20"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="max-w-2xl mx-auto py-4 mb-[80px] md:mt-0 mt-10 space-y-6">
               {chatHistory.length > 0 ? (
                 chatHistory.map((chat, index) => (
                   <div key={index} className="space-y-6">
                     {/* User's Prompt */}
-                    <div className="flex items-start flex-col justify-center gap-2">
-                      <div className="flex items-center mb-2 gap-4">
-                        <div className="">
-                          <Image
-                            src="/images/man.png"
-                            alt="User Avatar"
-                            width={35}
-                            height={35}
-                            blurDataURL="data:..."
-                            placeholder="blur"
-                            className="rounded-full"
-                          />
-                        </div>
-                        <div className="font-bold text-black text-base">
-                          User
-                        </div>
+                    <div className="flex flex-col items-start gap-2">
+                      <div className="flex items-center justify-start gap-4 mb-2">
+                        {session?.user?.image && (
+                          <div className="flex justify-start">
+                            <Image
+                              src={session.user.image}
+                              alt="User Avatar"
+                              width={35}
+                              height={35}
+                              blurDataURL="data:..."
+                              placeholder="blur"
+                              className="rounded-full"
+                            />
+                          </div>
+                        )}
+                        {session?.user?.name && (
+                          <div className="font-bold text-black text-base">
+                            {session.user.name}
+                          </div>
+                        )}
                       </div>
                       <div className="bg-gray-100 p-3 ml-7 rounded-xl shadow-md text-black font-medium max-w-xl">
                         <ReactMarkdown>{chat.prompt}</ReactMarkdown>
@@ -527,4 +560,4 @@ function WanderlustAI() {
   );
 }
 
-export default WanderlustAI;
+export default ChatHistory;
