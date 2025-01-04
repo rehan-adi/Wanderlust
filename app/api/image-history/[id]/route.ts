@@ -3,52 +3,6 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
-// GET method to fetch image history
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) => {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized: No user ID provided" },
-        { status: 403 }
-      );
-    }
-
-    const ImageHistory = await prisma.imagePromptHistory.findFirst({
-      where: {
-        id: params.id,
-        userId: session.user.id,
-      },
-      select: {
-        prompt: true,
-        imageUrl: true,
-      },
-    });
-
-    if (!ImageHistory) {
-      return NextResponse.json(
-        { success: false, message: "No image found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      ImageHistory: ImageHistory,
-    });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { success: false, message: "Server Error" },
-      { status: 500 }
-    );
-  }
-};
-
 // DELETE method to delete image history
 export const DELETE = async (
   req: NextRequest,
