@@ -118,11 +118,11 @@ const Profile = () => {
                 key={idx}
                 className="flex justify-between items-center border-t border-black border-opacity-15 py-3 md:flex-row gap-3 text-gray-300"
               >
-                <div className="h-4 w-20 bg-gray-700 bg-opacity-50 rounded animate-pulse"></div>
+                <div className="h-4 w-20 bg-gray-400 bg-opacity-50 rounded animate-pulse"></div>
                 {idx < 2 ? (
-                  <div className="h-4 w-48 bg-gray-700 bg-opacity-50 rounded animate-pulse"></div>
+                  <div className="h-4 w-48 bg-gray-400 bg-opacity-50 rounded animate-pulse"></div>
                 ) : (
-                  <div className="h-10 w-10 bg-gray-700 bg-opacity-50 rounded-full animate-pulse"></div>
+                  <div className="h-10 w-10 bg-gray-400 bg-opacity-50 rounded-full animate-pulse"></div>
                 )}
               </div>
             ))}
@@ -136,7 +136,7 @@ const Profile = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
             {Array.from({ length: 6 }).map((_, idx) => (
               <div key={idx} className="">
-                <div className="w-full h-52 bg-gray-700 bg-opacity-50 rounded-xl animate-pulse"></div>
+                <div className="w-full h-72 bg-gray-400 bg-opacity-50 rounded-xl animate-pulse"></div>
               </div>
             ))}
           </div>
@@ -237,7 +237,7 @@ const Profile = () => {
                     alt={selectedImage.prompt || "Generated Image"}
                     width={600}
                     height={600}
-                    className="object-cover w-full h-96"
+                    className="object-cover w-full h-[365px]"
                   />
                 </div>
                 <div className="px-4 text-center py-7">
