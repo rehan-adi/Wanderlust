@@ -1,7 +1,6 @@
 "use client";
 
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   ChevronUp,
@@ -10,7 +9,9 @@ import {
   Settings,
   History,
   Fullscreen,
+  Download,
 } from "lucide-react";
+import Image from "next/image";
 
 type ImagePromptHistory = {
   id: string;
@@ -20,8 +21,6 @@ type ImagePromptHistory = {
 };
 
 const SettingsPage = () => {
-  const router = useRouter();
-
   const [imageLen, setImageLen] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +28,11 @@ const SettingsPage = () => {
   const [imageHistory, setImageHistory] = useState<
     ImagePromptHistory[] | undefined
   >(undefined);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<ImagePromptHistory | null>(
+    null
+  );
 
   const getChatHistory = async () => {
     try {
@@ -48,13 +52,65 @@ const SettingsPage = () => {
     }
   };
 
-  const handleViewClick = (id: string) => {
-    router.push(`/chat-history/${id}`);
+  const handleViewClick = (image: ImagePromptHistory) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
   };
 
   useEffect(() => {
     getChatHistory();
   }, []);
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
+  const downloadImage = (url: string, name: string) => {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        link.click();
+      })
+      .catch((error) => {
+        console.error("Error downloading image:", error);
+      });
+  };
+
+  // Modal component
+  const Modal = ({ image }: { image: ImagePromptHistory }) => (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-80 px-2 flex justify-center items-center z-50"
+      onClick={closeModal}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-md overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative">
+          <Image
+            src={image.imageUrl}
+            alt={image.prompt || "Generated Image"}
+            width={600}
+            height={600}
+            className="object-cover w-full h-[365px]"
+          />
+        </div>
+        <div className="px-4 text-center py-7">
+          <p className="text-base text-center font-medium">{image.prompt}</p>
+          <button
+            onClick={() => downloadImage(image.imageUrl, "image.jpg")}
+            className="mt-8 mb-2 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
+          >
+            <Download size={18} className="inline-block mr-3" />
+            Downloade this Image
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   // Skeleton loader component
   const SkeletonLoader = () => (
@@ -137,7 +193,7 @@ const SettingsPage = () => {
                           {image.prompt}
                         </span>
                         <button
-                          onClick={() => handleViewClick(image.id)}
+                          onClick={() => handleViewClick(image)}
                           className=""
                         >
                           <Fullscreen size={20} />
@@ -153,6 +209,8 @@ const SettingsPage = () => {
           )}
         </div>
       </section>
+
+      {isModalOpen && selectedImage && <Modal image={selectedImage} />}
     </div>
   );
 };
