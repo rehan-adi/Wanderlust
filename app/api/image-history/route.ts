@@ -28,10 +28,17 @@ export const GET = async (req: NextRequest) => {
       },
     });
 
+    const imageCount = await prisma.imagePromptHistory.count({
+      where: {
+        userId: userId,
+      },
+    });
+
     return NextResponse.json(
       {
         success: true,
         imageHistory: imageHistory,
+        imageCount: imageCount,
         message: "Successfully fetched image history",
       },
       { status: 200 }
