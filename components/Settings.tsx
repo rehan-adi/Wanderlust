@@ -3,37 +3,39 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  HardDriveDownload,
+  Settings,
+  History,
+  Fullscreen,
+} from "lucide-react";
 
-type ChatHistory = {
+type ImagePromptHistory = {
+  id: string;
   prompt: string;
   imageUrl: string;
   createdAt: string;
 };
 
-type ChatSession = {
-  id: string;
-  chatHistory: ChatHistory[];
-};
-
-const Settings = () => {
+const SettingsPage = () => {
   const router = useRouter();
 
   const [imageLen, setImageLen] = useState<number>();
-  const [showHistory, setShowHistory] = useState<boolean>(true);
-  const [chatSessions, setChatSessions] = useState<ChatSession[] | undefined>(
-    undefined
-  );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState<boolean>(true);
+  const [imageHistory, setImageHistory] = useState<
+    ImagePromptHistory[] | undefined
+  >(undefined);
 
   const getChatHistory = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/chat-history");
-      console.log(response.data);
+      const response = await axios.get("/api/image-history");
       if (response.data.success) {
-        setChatSessions(response.data.sessions);
+        setImageHistory(response.data.imageHistory);
         setImageLen(response.data.imageCount);
       } else {
         setError("Failed to fetch chat history.");
@@ -57,27 +59,31 @@ const Settings = () => {
   // Skeleton loader component
   const SkeletonLoader = () => (
     <div className="animate-pulse space-y-4">
-      <div className="h-6 bg-gray-600 bg-opacity-50 rounded w-1/2"></div>
-      <div className="h-6 bg-gray-600 bg-opacity-50 rounded w-2/3"></div>
+      <div className="h-6 bg-gray-300 bg-opacity-50 rounded w-1/2"></div>
+      <div className="h-6 bg-gray-300 bg-opacity-50 rounded w-2/3"></div>
     </div>
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 py-8">
-      <h1 className="text-3xl font-semibold text-black">Settings</h1>
-
+    <div className="max-w-4xl mx-auto px-4 lg:px-8 pt-24 py-8">
+      <h1 className="text-2xl font-semibold text-black">
+        <Settings className="inline-block mr-1 mb-1" /> Setting
+      </h1>
       {/* Data Usage Section */}
-      <section className="mt-8 bg-white shadow-lg border rounded-xl p-6">
-        <h2 className="text-2xl font-semibold text-black">Data Usage</h2>
-        <div className="mt-4 space-y-2">
+      <section className="mt-8 bg-white shadow-md border rounded-xl p-6">
+        <h2 className="text-xl font-semibold text-black">
+          <HardDriveDownload size={22} className="inline-block mb-2 mr-2" />{" "}
+          Data Usage
+        </h2>
+        <div className="mt-5 space-y-2">
           {loading ? (
             <SkeletonLoader />
           ) : (
             <>
-              <p className="text-gray-700">
+              <p className="text-gray-700 font-medium">
                 Total images generated: <strong>{imageLen}</strong>
               </p>
-              <p className="text-gray-700">
+              <p className="text-gray-700 font-medium">
                 Remaining credits: <strong>Unlimited</strong>
               </p>
             </>
@@ -85,9 +91,11 @@ const Settings = () => {
         </div>
       </section>
 
-      {/* Chat History Section */}
-      <section className="mt-8 bg-white shadow-lg border rounded-xl px-6 py-4">
-        <h2 className="text-2xl font-semibold text-black">Chat History</h2>
+      {/* Image History Section */}
+      <section className="mt-8 bg-white shadow-md border rounded-xl px-6 py-4">
+        <h2 className="text-xl font-semibold text-black">
+          <History size={20} className="inline-block mr-1 mb-1" /> Image History
+        </h2>
         <div className="mt-4 flex items-center space-x-2">
           <button
             onClick={() => setShowHistory(!showHistory)}
@@ -96,19 +104,19 @@ const Settings = () => {
             {showHistory ? (
               <>
                 <ChevronUp size={20} />
-                <span className="text-gray-600">Hide chat history</span>
+                <span className="text-gray-600">Hide image history</span>
               </>
             ) : (
               <>
                 <ChevronDown size={20} />
-                <span className="text-gray-600">Show chat history</span>
+                <span className="text-gray-600">Show image history</span>
               </>
             )}
           </button>
         </div>
         <div
           className={`mt-4 transition-all duration-500 ease-in-out ${
-            showHistory ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            showHistory ? "min-h-24 opacity-100" : "max-h-0 opacity-0"
           } overflow-hidden`}
         >
           {loading ? (
@@ -118,28 +126,25 @@ const Settings = () => {
           ) : (
             showHistory && (
               <div className="mt-6 border-t border-gray-300 pt-4">
-                {chatSessions && chatSessions.length > 0 ? (
-                  chatSessions.map((session) => (
-                    <div key={session.id} className="mt-4">
-                      {session.chatHistory.length > 0 ? (
-                        <ul className="space-y-3">
-                          <li className="flex justify-between items-start">
-                            <span className="text-gray-800 w-[80%]">
-                              {session.chatHistory[0].prompt}
-                            </span>
-                            <button
-                              onClick={() => handleViewClick(session.id)}
-                              className="text-sm font-semibold underline text-blue-500"
-                            >
-                              View
-                            </button>
-                          </li>
-                        </ul>
-                      ) : (
-                        <p>No chat history available</p>
-                      )}
-                    </div>
-                  ))
+                {imageHistory && imageHistory.length > 0 ? (
+                  <div className="space-y-5">
+                    {imageHistory.map((image) => (
+                      <div
+                        key={image.id}
+                        className="flex justify-between items-start"
+                      >
+                        <span className="text-black font-medium md:w-[80%] w-[88%]">
+                          {image.prompt}
+                        </span>
+                        <button
+                          onClick={() => handleViewClick(image.id)}
+                          className=""
+                        >
+                          <Fullscreen size={20} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <p>No chat sessions found.</p>
                 )}
@@ -152,4 +157,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsPage;
