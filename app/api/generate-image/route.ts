@@ -54,7 +54,9 @@ export const POST = async (req: NextRequest) => {
     let imageBuffer: Buffer;
 
     if (typeof response !== "string") {
-      const arrayBuffer = await (response as any).arrayBuffer?.();
+      const blob = response as Blob;
+      const arrayBuffer = await blob.arrayBuffer();
+      //      const arrayBuffer = await (response as any).arrayBuffer?.();
       imageBuffer = Buffer.from(arrayBuffer);
     } else if (response.startsWith("data:image/")) {
       const base64Data = response.split(",")[1];
@@ -123,7 +125,7 @@ export const POST = async (req: NextRequest) => {
       { success: true, imageUrl, message: "Image generated successfully" },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -134,12 +136,12 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    console.error("Error:", error.message || error);
+    console.error("Error:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Error generating image",
-        error: error.message || "Unknown error",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

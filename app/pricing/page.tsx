@@ -40,7 +40,7 @@ export default function PricingPage() {
           <CardContent>
             <div className="text-3xl font-bold">
               ₹Free
-              <span className="text-base font-semibold">/individual</span>
+              <span className="text-base font-semibold">&apos;individual</span>
             </div>
           </CardContent>
           <CardFooter>
@@ -106,8 +106,8 @@ export default function PricingPage() {
               How does the plan limit work?
             </h3>
             <p className="text-muted-foreground font-medium">
-              If you go over your limit we'll nicely ask you to upgrade. You can
-              create up to 100 images per month for free.
+              If you go over your limit we&#39;ll nicely ask you to upgrade. You
+              can create up to 100 images per month for free.
             </p>
           </div>
           <div className="rounded-lg border bg-card text-card-foreground p-6">

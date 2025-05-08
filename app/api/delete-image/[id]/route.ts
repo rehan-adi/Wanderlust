@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
 export const DELETE = async (
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     const session = await getServerSession(authOptions);
@@ -17,8 +17,7 @@ export const DELETE = async (
       );
     }
 
-    const data = await params;
-    const id = data.id;
+    const id = (await params).id;
 
     if (!id) {
       return NextResponse.json(

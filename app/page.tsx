@@ -22,15 +22,13 @@ export default function Home() {
             </h1>
             <p className="text-lg text-muted-foreground max-w-[600px]">
               Unlock the power of AI to create stunning images, generate text,
-              and write code with ease. Whether you're designing or building
-              apps, our tools help boost your creativity and productivity.
+              and write code with ease. Whether you&apos;re designing or
+              building apps, our tools help boost your creativity and
+              productivity.
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            <Button
-              asChild
-              className="bg-black text-white py-5"
-            >
+            <Button asChild className="bg-black text-white py-5">
               <Link href="/dashboard">
                 Browse services <MoveRight className="inline-block" />
               </Link>

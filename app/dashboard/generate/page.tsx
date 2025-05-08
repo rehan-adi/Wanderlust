@@ -33,11 +33,26 @@ export default function ImageGenerator() {
       setGeneratedImage(imageUrl);
       setPrompt("");
       setSeed("");
-    } catch (error: any) {
+      console.log(isPreviewing);
+    } catch (error) {
       console.error("Error generating image:", error);
       const message =
-        error.response?.data?.message || "An error occurred. Please try again.";
-      const fieldErrors = error.response?.data?.errors?.fieldErrors;
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message?: string }).message ||
+            "An error occurred. Please try again."
+          : "An error occurred. Please try again.";
+      const fieldErrors =
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: unknown }).response === "object" &&
+        (
+          error as {
+            response?: {
+              data?: { errors?: { fieldErrors?: Record<string, string[]> } };
+            };
+          }
+        ).response?.data?.errors?.fieldErrors;
       const errorMessages = fieldErrors
         ? Object.values(fieldErrors).flat().join("\n")
         : "";
@@ -89,9 +104,9 @@ export default function ImageGenerator() {
             <CardTitle className="text-xl">Imagen AI Image Generator</CardTitle>
             <p className="text-base text-muted-foreground">
               Create unique images by providing a descriptive prompt and
-              optional seed. The prompt defines the image's theme, while the
-              seed ensures consistent styles across generations. Please refrain
-              from generating explicit or inappropriate content.
+              optional seed. The prompt defines the image&apos;s theme, while
+              the seed ensures consistent styles across generations. Please
+              refrain from generating explicit or inappropriate content.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">

@@ -14,19 +14,18 @@ interface ProfileData {
   images: { id: string; imageUrl: string; prompt: string; createdAt: string }[];
 }
 
-interface ImagesData {
+interface ImageData {
   id: string;
   imageUrl: string;
   prompt: string;
-  user: [];
-  createdAt: Date;
+  createdAt: string;
 }
 
 const Profile = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [selectedImage, setSelectedImage] = useState<ImagesData | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   const getProfileData = async () => {
     setLoading(true);
@@ -83,7 +82,7 @@ const Profile = () => {
       });
   };
 
-  const openModal = (img: any) => {
+  const openModal = (img: ImageData) => {
     setSelectedImage(img);
   };
 

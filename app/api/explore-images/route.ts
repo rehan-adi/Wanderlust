@@ -23,13 +23,13 @@ export const GET = async () => {
       { success: false, message: "No images found" },
       { status: 404 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log(error);
     return NextResponse.json(
       {
         success: false,
         message: "Internal server error",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -34,7 +35,6 @@ import {
   Loader2,
   Copy,
   Check,
-  CodeSquare,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -44,6 +44,11 @@ interface ChatMessage {
   text?: string;
   content: string;
   isUser: boolean;
+}
+
+interface Chat {
+  id: string;
+  chatHistory?: { prompt: string }[];
 }
 
 function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
@@ -103,7 +108,7 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
               </div>
             ) : (
               <>
-                {chatHistory.map((chat: any) => (
+                {chatHistory.map((chat: Chat) => (
                   <Button
                     key={chat.id}
                     variant="outline"
@@ -454,12 +459,14 @@ export default function Chatpage() {
                         className="prose max-w-xl leading-relaxed space-y-4"
                         components={{
                           code({
-                            node,
                             inline,
                             className,
                             children,
                             ...props
-                          }: any) {
+                          }: ComponentPropsWithoutRef<"code"> & {
+                            inline?: boolean;
+                            children?: ReactNode;
+                          }) {
                             const match = /language-(\w+)/.exec(
                               className || ""
                             );

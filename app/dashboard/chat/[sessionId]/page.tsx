@@ -8,13 +8,18 @@ import "tailwindcss/tailwind.css";
 import ReactMarkdown from "react-markdown";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  ReactNode,
+  useEffect,
+  useState,
+  ComponentPropsWithoutRef,
+} from "react";
 import {
   Send,
   Settings,
@@ -45,6 +50,11 @@ interface ChatMessage {
   text?: string;
   content: string;
   isUser: boolean;
+}
+
+interface Chat {
+  id: string;
+  chatHistory?: { prompt: string }[];
 }
 
 function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
@@ -104,7 +114,7 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
               </div>
             ) : (
               <>
-                {chatHistory.map((chat: any) => (
+                {chatHistory.map((chat: Chat) => (
                   <Button
                     key={chat.id}
                     variant="outline"
@@ -290,6 +300,8 @@ function ChatHistory() {
     if (!chatStarted) {
       setChatStarted(true);
     }
+    console.log(chatSessionId)
+    console.log(chatMessages)
 
     try {
       const response = await axios.post("/api/chat/send-message", {
@@ -456,12 +468,14 @@ function ChatHistory() {
                           className="prose max-w-xl leading-relaxed space-y-4"
                           components={{
                             code({
-                              node,
                               inline,
                               className,
                               children,
                               ...props
-                            }: any) {
+                            }: ComponentPropsWithoutRef<"code"> & {
+                              inline?: boolean;
+                              children?: ReactNode;
+                            }) {
                               const match = /language-(\w+)/.exec(
                                 className || ""
                               );

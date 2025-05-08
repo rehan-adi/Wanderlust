@@ -1,8 +1,9 @@
 import prisma from "@/lib/prisma";
-import { NextAuthOptions } from "next-auth";
+import { AdapterUser } from "next-auth/adapters";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
+import { NextAuthOptions, User, Session } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -20,12 +21,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }: { user: any }) {
+    async signIn({ user }: { user: User | AdapterUser }) {
       const existingUser = await prisma.user.findUnique({
-        where: { email: user.email },
+        where: { email: user?.email ?? undefined },
       });
 
-      if (!existingUser) {
+      if (!existingUser && user.email) {
         await prisma.user.create({
           data: {
             email: user.email,
@@ -37,16 +38,18 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
-    async session({ session, user }: { session: any; user: any }) {
-      if (session.user) {
+    async session({ session }: { session: Session }) {
+      if (session.user?.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: session.user.email || "" },
         });
-        session.user.id = dbUser?.id;
+        if (dbUser) {
+          session.user.id = dbUser?.id;
+        }
       }
       return session;
     },
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }

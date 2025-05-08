@@ -1,9 +1,9 @@
 import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/options";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
     const session = await getServerSession(authOptions);
 
@@ -48,13 +48,13 @@ export const GET = async (req: NextRequest) => {
       { success: true, user, message: "User profile retrieved successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user profile:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Internal server error",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
