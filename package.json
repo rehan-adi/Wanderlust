@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@huggingface/inference": "^3.12.1",
     "@pinecone-database/pinecone": "^4.0.0",
     "@prisma/client": "6.0.0",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -38,6 +39,7 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

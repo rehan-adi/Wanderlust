@@ -11,6 +11,9 @@ importers:
       '@google/generative-ai':
         specifier: ^0.21.0
         version: 0.21.0
+      '@huggingface/inference':
+        specifier: ^3.12.1
+        version: 3.12.1
       '@pinecone-database/pinecone':
         specifier: ^4.0.0
         version: 4.0.0
@@ -95,6 +98,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.15)
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -167,6 +173,17 @@ packages:
   '@google/generative-ai@0.21.0':
     resolution: {integrity: sha512-7XhUbtnlkSEZK15kN3t+tzIMxsbKm/dSkKBFalj+20NvPKe1kBY7mR2P7vuijEn+f06z5+A8bVGKO0v39cr6Wg==}
     engines: {node: '>=18.0.0'}
+
+  '@huggingface/inference@3.12.1':
+    resolution: {integrity: sha512-gRnRHZkVAb7mzmPnLcFrttA17yZdUiz+xLqk19FBwCsCjBBlcDCXVIrZ3RW1DdZq297PB6m6t995600sDq3T6g==}
+    engines: {node: '>=18'}
+
+  '@huggingface/jinja@0.4.1':
+    resolution: {integrity: sha512-3WXbMFaPkk03LRCM0z0sylmn8ddDm4ubjU7X+Hg4M2GOuMklwoGAFXp9V2keq7vltoB/c7McE5aHUVVddAewsw==}
+    engines: {node: '>=18'}
+
+  '@huggingface/tasks@0.19.3':
+    resolution: {integrity: sha512-+wfh60cGucPRlesd9Q9BFKHqLPaYB4FbNbFonlVFBm+rTVkSLXBU3iiv/0MUofR3H2rhrRlKT5QQ5oSmr6BhsA==}
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -2670,6 +2687,10 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
@@ -2774,6 +2795,15 @@ snapshots:
   '@eslint/js@8.57.1': {}
 
   '@google/generative-ai@0.21.0': {}
+
+  '@huggingface/inference@3.12.1':
+    dependencies:
+      '@huggingface/jinja': 0.4.1
+      '@huggingface/tasks': 0.19.3
+
+  '@huggingface/jinja@0.4.1': {}
+
+  '@huggingface/tasks@0.19.3': {}
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -5605,6 +5635,8 @@ snapshots:
       '@types/react': 18.3.12
 
   util-deprecate@1.0.2: {}
+
+  uuid@11.1.0: {}
 
   uuid@8.3.2: {}
 

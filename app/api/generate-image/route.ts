@@ -1,19 +1,17 @@
 import z from "zod";
-import axios from "axios";
+import { v4 as uuid } from "uuid";
 import prisma from "@/lib/prisma";
+import { pinecone } from "@/lib/pinecone";
+import { client } from "@/utils/huggingface";
 import { getServerSession } from "next-auth";
-import { pinecone } from "../../../lib/pinecone";
+import { HUGGINGFACE_MODEL } from "@/config/config";
 import { getTextEmbedding } from "@/utils/embedding";
-import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
+import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { authOptions } from "../auth/[...nextauth]/options";
 
-const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY as string;
-const HUGGINGFACE_IMAGE_MODEL_API_URL = process.env
-  .HUGGINGFACE_IMAGE_MODEL_API_URL as string;
-
 const promptValidation = z.object({
-  prompt: z.string().max(400, "Prompt must be less than 400 characters"),
+  prompt: z.string().max(444, "Prompt must be less than 444 characters"),
 });
 
 export const POST = async (req: NextRequest) => {
@@ -33,63 +31,96 @@ export const POST = async (req: NextRequest) => {
     const userId = session.user.id;
 
     const body = await req.json();
-    const prompt = promptValidation.parse(body);
+    const validatePromptdata = promptValidation.safeParse(body);
 
-    const response = await axios.post(
-      HUGGINGFACE_IMAGE_MODEL_API_URL,
-      { inputs: prompt.prompt },
-      {
-        headers: {
-          Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
-          "Content-Type": "application/json",
+    if (!validatePromptdata.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation failed",
+          errors: validatePromptdata.error.flatten(),
         },
-        responseType: "arraybuffer",
-      }
-    );
+        { status: 400 }
+      );
+    }
 
-    const imageBuffer = Buffer.from(response.data);
+    const response: Blob | string = await client.textToImage({
+      provider: "hf-inference",
+      model: HUGGINGFACE_MODEL,
+      inputs: validatePromptdata.data.prompt,
+      parameters: { guidance_scale: 8 },
+    });
+
+    let imageBuffer: Buffer;
+
+    if (typeof response !== "string") {
+      const arrayBuffer = await (response as any).arrayBuffer?.();
+      imageBuffer = Buffer.from(arrayBuffer);
+    } else if (response.startsWith("data:image/")) {
+      const base64Data = response.split(",")[1];
+      imageBuffer = Buffer.from(base64Data, "base64");
+    } else {
+      return NextResponse.json(
+        { success: false, message: "Unsupported image format from API" },
+        { status: 500 }
+      );
+    }
 
     const cloudinaryResponse = await uploadOnCloudinary(imageBuffer);
 
     if (!cloudinaryResponse) {
       return NextResponse.json(
-        { success: false, message: "Error uploading image to Cloudinary" },
+        { success: false, message: "Failed to upload image to Cloudinary" },
         { status: 500 }
       );
     }
 
+    console.log("Image created and uploaded to Cloudnary");
+
     const imageUrl = cloudinaryResponse.secure_url;
 
-    const embedding = await getTextEmbedding(prompt.prompt);
+    const embedding = await getTextEmbedding(validatePromptdata.data.prompt);
     const index = pinecone.Index("image-embeddings");
-    const vectorId = `image-${Date.now()}`;
+    const vectorId = `image-${uuid()}`;
 
-    await index.upsert([
-      {
-        id: vectorId,
-        metadata: { prompt: prompt.prompt, imageUrl },
-        values: embedding,
-      },
-    ]);
+    try {
+      await index.upsert([
+        {
+          id: vectorId,
+          metadata: { prompt: validatePromptdata.data.prompt, imageUrl },
+          values: embedding,
+        },
+      ]);
+    } catch (pineconeError) {
+      console.error("Pinecone upsert failed:", pineconeError);
+    }
 
-    await prisma.imagePromptHistory.create({
-      data: {
-        userId: userId,
-        imageUrl,
-        prompt: prompt.prompt,
-      },
-    });
+    try {
+      await prisma.imagePromptHistory.create({
+        data: {
+          userId,
+          prompt: validatePromptdata.data.prompt,
+          imageUrl,
+        },
+      });
+    } catch (historyError) {
+      console.error("Failed to save prompt history:", historyError);
+    }
 
-    await prisma.images.create({
-      data: {
-        userId: userId,
-        imageUrl,
-        prompt: prompt.prompt,
-      },
-    });
+    try {
+      await prisma.images.create({
+        data: {
+          userId,
+          prompt: validatePromptdata.data.prompt,
+          imageUrl,
+        },
+      });
+    } catch (imageSaveError) {
+      console.error("Failed to save image record:", imageSaveError);
+    }
 
     return NextResponse.json(
-      { success: true, imageUrl, message: "Image Generated successfuly" },
+      { success: true, imageUrl, message: "Image generated successfully" },
       { status: 201 }
     );
   } catch (error: any) {
@@ -102,12 +133,13 @@ export const POST = async (req: NextRequest) => {
         { status: 400 }
       );
     }
-    console.error("Unexpected error:", error.response?.data || error.message);
+
+    console.error("Error:", error.message || error);
     return NextResponse.json(
       {
         success: false,
         message: "Error generating image",
-        error: error.message,
+        error: error.message || "Unknown error",
       },
       { status: 500 }
     );
