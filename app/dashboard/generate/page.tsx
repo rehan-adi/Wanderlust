@@ -37,8 +37,12 @@ export default function ImageGenerator() {
       console.error("Error generating image:", error);
       const message =
         error.response?.data?.message || "An error occurred. Please try again.";
+      const fieldErrors = error.response?.data?.errors?.fieldErrors;
+      const errorMessages = fieldErrors
+        ? Object.values(fieldErrors).flat().join("\n")
+        : "";
       toast.error("Error generating image", {
-        description: message,
+        description: `${message}\n${errorMessages}`,
       });
     } finally {
       setLoading(false);
