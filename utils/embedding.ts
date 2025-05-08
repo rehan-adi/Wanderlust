@@ -1,6 +1,5 @@
+import { GEMINI_API_KEY } from "@/config/config";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY as string;
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
