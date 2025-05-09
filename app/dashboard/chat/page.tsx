@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -34,6 +34,7 @@ import {
   Loader2,
   Copy,
   Check,
+  Trash2,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -53,7 +54,7 @@ interface Chat {
 function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
   const router = useRouter();
 
-  const [chatHistory, setChatHistory] = useState<[]>([]);
+  const [chatHistory, setChatHistory] = useState<Chat[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -69,6 +70,17 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
       console.log("Failed to get chat history:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteChatSession = async (sessionId: string) => {
+    try {
+      await axios.delete(`/api/chat/delete-sessions/${sessionId}`);
+      setChatHistory((prev) => prev.filter((chat) => chat.id !== sessionId));
+      toast.success("Chat deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      toast.error("Failed to delete chat");
     }
   };
 
@@ -108,16 +120,24 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
             ) : (
               <>
                 {chatHistory.map((chat: Chat) => (
-                  <Button
-                    key={chat.id}
-                    variant="outline"
-                    className="w-full py-5 justify-start"
-                    onClick={() => getHistory(chat.id)}
-                  >
-                    <div className="truncate max-w-full">
-                      {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
-                    </div>
-                  </Button>
+                  <div key={chat.id} className="relative group">
+                    <Button
+                      variant="outline"
+                      className="w-full py-5 justify-start"
+                      onClick={() => getHistory(chat.id)}
+                    >
+                      <div className="truncate max-w-[80%]">
+                        {chat.chatHistory?.[0]?.prompt || "Untitled Chat"}
+                      </div>
+                    </Button>
+                    <button
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full group-hover:opacity-100 transition-opacity hover:bg-gray-200"
+                      onClick={(e) => deleteChatSession(chat.id)}
+                      title="Delete chat"
+                    >
+                      <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500 transition-colors" />
+                    </button>
+                  </div>
                 ))}
               </>
             )}
