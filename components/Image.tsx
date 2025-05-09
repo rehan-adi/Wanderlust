@@ -5,10 +5,19 @@ import Image from "next/image";
 import { useState } from "react";
 import { Download } from "lucide-react";
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface ImagesData {
   imageUrl: string;
   prompt: string;
-  user: [];
+  user: User;
   createdAt: Date;
 }
 

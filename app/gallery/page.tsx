@@ -1,15 +1,5 @@
 import { Images } from "@/components/Image";
-
-async function getImages() {
-  try {
-    const response = await fetch("http://localhost:3000/api/explore-images");
-    const data = await response.json();
-    return data.images;
-  } catch (error) {
-    console.error("Error fetching images:", error);
-    return [];
-  }
-}
+import  {getImages}  from "@/lib/getImages"
 
 export default async function Gallery() {
   const images = await getImages();
