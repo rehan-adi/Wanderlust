@@ -33,7 +33,7 @@ model ChatHistory {
   prompt        String
   message       String
   chatSessionId String
-  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
