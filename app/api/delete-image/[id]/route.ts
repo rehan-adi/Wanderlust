@@ -5,19 +5,19 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 
 export const DELETE = async (
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) => {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, message: "Unauthorized: No user ID provided" },
         { status: 403 }
       );
     }
 
-    const id = (await params).id;
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -27,9 +27,7 @@ export const DELETE = async (
     }
 
     const user = await prisma.user.findUnique({
-      where: {
-        id: session.user.id,
-      },
+      where: { id: session.user.id },
     });
 
     if (!user) {
@@ -40,9 +38,7 @@ export const DELETE = async (
     }
 
     const image = await prisma.images.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (!image) {
@@ -53,9 +49,7 @@ export const DELETE = async (
     }
 
     await prisma.images.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     return NextResponse.json({

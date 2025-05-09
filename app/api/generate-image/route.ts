@@ -11,7 +11,7 @@ import { uploadOnCloudinary } from "@/utils/cloudinary";
 import { authOptions } from "../auth/[...nextauth]/options";
 
 const promptValidation = z.object({
-  prompt: z.string().max(444, "Prompt must be less than 444 characters"),
+  prompt: z.string().max(300, "Prompt must be less than 300 characters"),
 });
 
 export const POST = async (req: NextRequest) => {
@@ -56,7 +56,6 @@ export const POST = async (req: NextRequest) => {
     if (typeof response !== "string") {
       const blob = response as Blob;
       const arrayBuffer = await blob.arrayBuffer();
-      //      const arrayBuffer = await (response as any).arrayBuffer?.();
       imageBuffer = Buffer.from(arrayBuffer);
     } else if (response.startsWith("data:image/")) {
       const base64Data = response.split(",")[1];
