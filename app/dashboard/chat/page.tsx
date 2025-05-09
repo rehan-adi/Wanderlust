@@ -4,7 +4,6 @@ import axios from "axios";
 import Link from "next/link";
 import { toast } from "sonner";
 import Image from "next/image";
-import "tailwindcss/tailwind.css";
 import ReactMarkdown from "react-markdown";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
