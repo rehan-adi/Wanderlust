@@ -22,6 +22,12 @@ export const metadata: Metadata = {
     icon: "/logo.svg",
   },
 
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : "http://localhost:3000"
+  ),
+
   // Open Graph metadata (for social media sharing)
   openGraph: {
     type: "website",
