@@ -10,7 +10,7 @@ import {
   History,
   Fullscreen,
   Download,
-  Trash,
+  Trash2,
   EllipsisVertical,
   Loader2,
 } from "lucide-react";
@@ -282,7 +282,7 @@ const SettingsPage = () => {
                                   </>
                                 ) : (
                                   <>
-                                    <Trash size={18} className="inline mr-2" />
+                                    <Trash2 size={18} className="inline mr-2" />
                                     Delete
                                   </>
                                 )}
