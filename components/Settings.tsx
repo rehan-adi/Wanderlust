@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ChevronUp,
   ChevronDown,
@@ -10,8 +10,12 @@ import {
   History,
   Fullscreen,
   Download,
+  Trash,
+  EllipsisVertical,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 type ImagePromptHistory = {
   id: string;
@@ -23,6 +27,7 @@ type ImagePromptHistory = {
 const SettingsPage = () => {
   const [imageLen, setImageLen] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState<boolean>(true);
   const [imageHistory, setImageHistory] = useState<
@@ -33,8 +38,11 @@ const SettingsPage = () => {
   const [selectedImage, setSelectedImage] = useState<ImagePromptHistory | null>(
     null
   );
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
-  const getChatHistory = async () => {
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const getImageHistory = async () => {
     try {
       setLoading(true);
       const response = await axios.get("/api/image-history");
@@ -52,13 +60,32 @@ const SettingsPage = () => {
     }
   };
 
+  const deleteChatHistory = async (id: string) => {
+    try {
+      setDeleteLoading(true);
+      const response = await axios.delete(`/api/image-history/${id}`);
+      if (response.data.success) {
+        toast.success("Deleted image history");
+        setImageHistory((prev) => prev?.filter((item) => item.id !== id));
+        setDeleteLoading(false);
+      } else {
+        toast.error("Failed to delete image history");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.error(error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleViewClick = (image: ImagePromptHistory) => {
     setSelectedImage(image);
     setIsModalOpen(true);
   };
 
   useEffect(() => {
-    getChatHistory();
+    getImageHistory();
   }, []);
 
   const closeModal = () => {
@@ -78,6 +105,22 @@ const SettingsPage = () => {
         console.error("Error downloading image:", error);
       });
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Modal component
   const Modal = ({ image }: { image: ImagePromptHistory }) => (
@@ -105,7 +148,7 @@ const SettingsPage = () => {
             className="mt-8 mb-2 md:px-20 px-14 py-2 bg-[#ECECF1] text-black font-semibold rounded-md"
           >
             <Download size={18} className="inline-block mr-3" />
-            Downloade this Image
+            Download this Image
           </button>
         </div>
       </div>
@@ -148,7 +191,7 @@ const SettingsPage = () => {
       </section>
 
       {/* Image History Section */}
-      <section className="mt-8 bg-white shadow-md border rounded-xl px-6 py-4">
+      <section className="mt-8 bg-white shadow-md border rounded-xl px-6 pt-4 pb-2">
         <h2 className="text-xl font-semibold text-black">
           <History size={20} className="inline-block mr-1 mb-1" /> Image History
         </h2>
@@ -181,7 +224,7 @@ const SettingsPage = () => {
             <p className="text-red-500">{error}</p>
           ) : (
             showHistory && (
-              <div className="mt-6 border-t border-gray-300 pt-4">
+              <div className="mt-3 border-t border-gray-300 pt-4 pb-10">
                 {imageHistory && imageHistory.length > 0 ? (
                   <div className="space-y-5">
                     {imageHistory.map((image) => (
@@ -192,17 +235,68 @@ const SettingsPage = () => {
                         <span className="text-black font-medium md:w-[80%] w-[88%]">
                           {image.prompt}
                         </span>
-                        <button
-                          onClick={() => handleViewClick(image)}
-                          className=""
-                        >
-                          <Fullscreen size={20} />
-                        </button>
+
+                        <div className="relative">
+                          <button
+                            onClick={() =>
+                              setOpenDropdownId((prev) =>
+                                prev === image.id ? null : image.id
+                              )
+                            }
+                          >
+                            <EllipsisVertical
+                              className="text-black"
+                              size={20}
+                            />
+                          </button>
+
+                          {openDropdownId === image.id && (
+                            <div
+                              ref={dropdownRef}
+                              className="absolute right-0 mt-2 w-36 bg-white border border-gray-300 rounded-md shadow-md z-50"
+                            >
+                              <button
+                                onClick={() => {
+                                  handleViewClick(image);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 font-semibold hover:bg-gray-100 text-sm"
+                              >
+                                <Fullscreen size={18} className="inline mr-2" />
+                                View
+                              </button>
+                              <button
+                                onClick={() => {
+                                  deleteChatHistory(image.id);
+                                  setSelectedImage(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600 z-50 font-semibold"
+                              >
+                                {deleteLoading ? (
+                                  <>
+                                    <Loader2
+                                      className="animate-spin inline mr-2"
+                                      size={16}
+                                    />
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash size={18} className="inline mr-2" />
+                                    Delete
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p>No chat sessions found.</p>
+                  <p className="text-gray-500 italic">
+                    You haven’t generated any images yet.
+                  </p>
                 )}
               </div>
             )

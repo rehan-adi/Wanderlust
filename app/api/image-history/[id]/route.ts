@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
-// DELETE method to delete image history
 export const DELETE = async (
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -18,24 +17,23 @@ export const DELETE = async (
       );
     }
 
-    // Delete the chat session
-    const deletedSession = await prisma.chatSession.delete({
+    const deleteChatHistory = await prisma.imagePromptHistory.delete({
       where: {
         id: params.id,
-        userId: session.user.id, // Ensure the session belongs to the logged-in user
+        userId: session.user.id,
       },
     });
 
-    if (!deletedSession) {
+    if (!deleteChatHistory) {
       return NextResponse.json(
-        { success: false, message: "Chat session not found" },
+        { success: false, message: "Failed to delete History" },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Chat session deleted successfully",
+      message: "Image history deleted successfully",
     });
   } catch (error) {
     console.error(error);
