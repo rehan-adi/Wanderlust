@@ -19,14 +19,21 @@ export const POST = async (req: NextRequest) => {
     const embedding = await getTextEmbedding(query);
 
     const index = pinecone.Index("image-embeddings");
-    const queryResponse = await index.namespace("image-embeddings").query({
+
+    const queryResponse = await index.query({
       vector: embedding,
       includeMetadata: true,
-      topK: 10,
+      topK: 2,
     });
-    console.log(queryResponse);
 
-    return NextResponse.json({ result: queryResponse});
+    return NextResponse.json({
+      result: queryResponse.matches.map((match) => ({
+        id: match.id,
+        score: match.score,
+        prompt: match.metadata?.prompt,
+        imageUrl: match.metadata?.imageUrl,
+      })),
+    });
   } catch (error) {
     return NextResponse.json(
       {
