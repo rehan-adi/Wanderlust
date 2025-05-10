@@ -1,10 +1,10 @@
-import { GEMINI_API_KEY } from "@/config/config";
+import { GEMINI_API_KEY, GEMINI_MODEL } from "@/config/config";
 import { GoogleGenerativeAI, Content } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-pro",
+  model: GEMINI_MODEL,
 });
 
 const generationConfig = {
