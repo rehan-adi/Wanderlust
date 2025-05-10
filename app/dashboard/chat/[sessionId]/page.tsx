@@ -139,7 +139,7 @@ function LeftSidebar({ onNewChat }: { onNewChat: () => void }) {
                     </Button>
                     <button
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full group-hover:opacity-100 transition-opacity hover:bg-gray-200"
-                      onClick={(e) => deleteChatSession(chat.id)}
+                      onClick={() => deleteChatSession(chat.id)}
                       title="Delete chat"
                     >
                       <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500 transition-colors" />
