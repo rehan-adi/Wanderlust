@@ -3,7 +3,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Search, Loader2, Eye } from "lucide-react";
-import Image from "next/image";
 
 interface Result {
   prompt: string;
