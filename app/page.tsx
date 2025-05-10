@@ -103,7 +103,7 @@ export default function Home() {
             </div>
             <div className="absolute bottom-8 left-12 animate-bounce">
               <Image
-                src="/openai.svg"
+                src="/huggingface.svg"
                 alt="Decoration 2"
                 width={40}
                 height={40}
