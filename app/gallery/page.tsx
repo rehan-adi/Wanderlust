@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Images } from "@/components/Image";
 import  {getImages}  from "@/lib/getImages"
 
